@@ -10,6 +10,11 @@ namespace Database.Models
         private bool isKeepIn;
         private Shape shape;
 
+        public Geofence(bool isKeepIn, Shape shape) {
+            this.isKeepIn = isKeepIn;
+            this.shape = shape;
+        }
+
         public void setShape(Shape shape) {
             this.shape = shape;
         }
