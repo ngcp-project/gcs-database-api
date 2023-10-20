@@ -28,7 +28,7 @@ namespace Database.Models
         }
 
         public void setLongitude(double longitude) {
-            return longitude;
+            this.longitude = longitude;
         }
     }
 }
