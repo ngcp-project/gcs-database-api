@@ -9,20 +9,20 @@ using Microsoft.Extensions.Logging;
 
 using StackExchange.Redis;
 
-namespace WebSocketsTutorial.Controllers
+namespace Database.Controllers
 {
 
     [ApiController]
     [Route("[controller]")]
-    public class WebSocketsController : ControllerBase
+    public class WebSocketController : ControllerBase
     {
         private new const int BadRequest = ((int)HttpStatusCode.BadRequest);
-        private readonly ILogger<WebSocketsController> _logger;
+        private readonly ILogger<WebSocketController> _logger;
 
         private ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
         private IDatabase db;
 
-        public WebSocketsController(ILogger<WebSocketsController> logger)
+        public WebSocketController(ILogger<WebSocketController> logger)
         {
             _logger = logger;
             db = redis.GetDatabase();
