@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 using StackExchange.Redis;
 
-namespace WebSocketsTutorial.Controllers
+namespace Database.Controllers
 {
 
     [ApiController]
