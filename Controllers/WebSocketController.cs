@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using Database.Models;
+using System.Text.Json;
+using Database.Models;
 
 using StackExchange.Redis;
 
