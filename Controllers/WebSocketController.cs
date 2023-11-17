@@ -40,11 +40,12 @@ namespace Database.Controllers
                 _logger.Log(LogLevel.Information, "WebSocket connection established");
                 await Echo(webSocket);
             }
-            else {
+            else
+            {
                 HttpContext.Response.StatusCode = BadRequest;
             }
         }
-        
+
         private async Task Echo(WebSocket webSocket)
         {
             var buffer = new byte[1024 * 4];
@@ -57,12 +58,13 @@ namespace Database.Controllers
                 //Console.WriteLine(value);
                 var inputString = Encoding.UTF8.GetString(buffer);
                 //Vehicle vehicleData = JsonSerializer.Deserialize<Vehicle>(inputString);
-                String vehicleData = JsonSerializer.Serialize(inputString);
+                // String vehicleData = JsonSerializer.Serialize(inputString);
+                Console.WriteLine(inputString);
 
                 //var vehicleKey = vehicleData.key;
 
 
-                
+
 
 
                 //var serverMsg = Encoding.UTF8.GetBytes($"Server: Hello. You said: {Encoding.UTF8.GetString(buffer)}");
