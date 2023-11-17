@@ -55,15 +55,22 @@ namespace Database.Controllers
             {
                 //string value = await db.StringGetAsync("foo");
                 //Console.WriteLine(value);
+                
+                var test = new Vehicle
+                {
+                    key = "Vehicle1"
+                };
+                string jsonString = JsonSerializer.Serialize(test);
+
                 var inputString = Encoding.UTF8.GetString(buffer);
-                var vehicleData = JsonSerializer.Deserialize<BaseTelemetry>(inputString);
-                var vehicleId = vehicleData.Id;
+                var vehicleData = JsonSerializer.Deserialize<Vehicle>(jsonString);
+                var vehicleKey = vehicleData.key;
 
                 //var serverMsg = Encoding.UTF8.GetBytes($"Server: Hello. You said: {Encoding.UTF8.GetString(buffer)}");
                 await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
                 // _logger.Log(LogLevel.Information, "Message sent to Client");
 
-                db.StringSet(vehicleData?.Name, inputString);
+                db.StringSet(vehicleKey, jsonString);
 
                 buffer = new byte[1024 * 4];
                 result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
