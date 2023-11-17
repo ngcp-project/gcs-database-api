@@ -6,6 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
+using Database.Models;
 
 using StackExchange.Redis;
 
@@ -53,15 +55,15 @@ namespace Database.Controllers
             {
                 //string value = await db.StringGetAsync("foo");
                 //Console.WriteLine(value);
+                var inputString = Encoding.UTF8.GetString(buffer);
+                var vehicleData = JsonSerializer.Deserialize<BaseTelemetry>(inputString);
+                var vehicleId = vehicleData.Id;
 
-                var serverMsg = Encoding.UTF8.GetBytes($"Server: Hello. You said: {Encoding.UTF8.GetString(buffer)}");
-                await webSocket.SendAsync(new ArraySegment<byte>(serverMsg, 0, serverMsg.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
+                //var serverMsg = Encoding.UTF8.GetBytes($"Server: Hello. You said: {Encoding.UTF8.GetString(buffer)}");
+                await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
                 // _logger.Log(LogLevel.Information, "Message sent to Client");
 
-                db.StringSet("test", System.Text.Encoding.Default.GetString(buffer));
-                
-                // string value = await db.StringGetAsync("test");
-                // Console.WriteLine(value);
+                db.StringSet(vehicleData?.Name, inputString);
 
                 buffer = new byte[1024 * 4];
                 result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
