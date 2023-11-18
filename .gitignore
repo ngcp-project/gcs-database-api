@@ -476,4 +476,5 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+pnpm-lock.yaml
 .env

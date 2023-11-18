@@ -2,33 +2,37 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Database.Models
 {
     public class Coordinate
     {
-        private double latitude;
-        private double longitude;
+        public double latitude {get; set;}
+        public double longitude {get; set;}
 
-        public Coordinate(double latitude, double longitude) {
-            this.latitude = latitude;
-            this.longitude = longitude;
-        }
+        // private double latitude;
+        // private double longitude;
 
-        public double getLatitude() {
-            return latitude;
-        }
+        // public Coordinate(double latitude, double longitude) {
+        //     this.latitude = latitude;
+        //     this.longitude = longitude;
+        // }
 
-        public void setLatitude(double latitude) {
-            this.latitude = latitude;
-        }
+        // public double getLatitude() {
+        //     return latitude;
+        // }
 
-        public double getLongitude() {
-            return longitude;
-        }
+        // public void setLatitude(double latitude) {
+        //     this.latitude = latitude;
+        // }
 
-        public void setLongitude(double longitude) {
-            this.longitude = longitude;
-        }
+        // public double getLongitude() {
+        //     return longitude;
+        // }
+
+        // public void setLongitude(double longitude) {
+        //     this.longitude = longitude;
+        // }
     }
 }
