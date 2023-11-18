@@ -2,6 +2,7 @@ const WebSocket = require('ws');
 
 let webSocket = new WebSocket('ws://localhost:5135/ws');
 
+
 // Sample Vehicle data
 let vehicleData = {
         key: "Vehicle 2",
