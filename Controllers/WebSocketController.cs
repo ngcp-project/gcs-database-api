@@ -41,11 +41,12 @@ namespace Database.Controllers
                 _logger.Log(LogLevel.Information, "WebSocket connection established");
                 await Echo(webSocket);
             }
-            else {
+            else
+            {
                 HttpContext.Response.StatusCode = BadRequest;
             }
         }
-        
+
         private async Task Echo(WebSocket webSocket)
         {
             var buffer = new byte[1024 * 4];
@@ -67,8 +68,6 @@ namespace Database.Controllers
 
                 // Get Vehicle key
                 var vehicleKey = vehicleData.key;
-
-                Console.WriteLine(vehicleData.key + " " + vehicleData.vehicleStatus);
 
                 // Send message back to clients
                 await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
