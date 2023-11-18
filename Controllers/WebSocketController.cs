@@ -10,6 +10,7 @@ using System.Text.Json;
 using Database.Models;
 
 using StackExchange.Redis;
+using Microsoft.Extensions.Primitives;
 
 namespace Database.Controllers
 {
@@ -55,21 +56,24 @@ namespace Database.Controllers
             {
                 //string value = await db.StringGetAsync("foo");
                 //Console.WriteLine(value);
-                var inputString = Encoding.UTF8.GetString(buffer);
-                //Vehicle vehicleData = JsonSerializer.Deserialize<Vehicle>(inputString);
-                String vehicleData = JsonSerializer.Serialize(inputString);
+                //string inputString = Encoding.UTF8.GetString(buffer);
 
-                //var vehicleKey = vehicleData.key;
+                // Store JSON as string
+                //string inputString = Encoding.UTF8.GetString(buffer.TakeWhile(x => x != 0).ToArray()); // This also works, not sure which is more efficient
+                string inputString = Encoding.UTF8.GetString(buffer).TrimEnd('\0');
 
+                // Deserialize JSON string
+                Vehicle vehicleData = JsonSerializer.Deserialize<Vehicle>(inputString);
 
-                
+                // Get Vehicle key
+                var vehicleKey = vehicleData.key;
 
+                Console.WriteLine(vehicleData.key + " " + vehicleData.vehicleStatus);
 
-                //var serverMsg = Encoding.UTF8.GetBytes($"Server: Hello. You said: {Encoding.UTF8.GetString(buffer)}");
+                // Send message back to clients
                 await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
-                // _logger.Log(LogLevel.Information, "Message sent to Client");
 
-                db.StringSet("vehicleKey", vehicleData);
+                db.StringSet(vehicleKey, inputString);
 
                 // db.StringSet("test", Encoding.UTF8.GetString(buffer));
 
