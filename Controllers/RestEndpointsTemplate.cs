@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+/*using Microsoft.AspNetCore.Mvc;
 
 namespace Database.Controllers;
 
@@ -16,4 +16,4 @@ public class ExampleController : ControllerBase
     [HttpGet]
 
     [HttpPost]
-}
+}*/

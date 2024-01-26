@@ -19,8 +19,8 @@ var UGV_tel = new {
 };
 
 
-json.Set("UGV_[timestamp]", "$", UGV_tel);
-Console.WriteLine(json.Get("UGV_[timestamp]")); // prints json
+//json.Set("UGV_[timestamp]", "$", UGV_tel);
+//Console.WriteLine(json.Get("UGV_[timestamp]")); // prints json
 
 var builder = WebApplication.CreateBuilder(args);
 
