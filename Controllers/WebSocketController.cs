@@ -10,6 +10,7 @@ using System.Text.Json;
 using Database.Models;
 
 using StackExchange.Redis;
+using Microsoft.Extensions.Primitives;
 
 namespace Database.Controllers
 {
@@ -40,11 +41,12 @@ namespace Database.Controllers
                 _logger.Log(LogLevel.Information, "WebSocket connection established");
                 await Echo(webSocket);
             }
-            else {
+            else
+            {
                 HttpContext.Response.StatusCode = BadRequest;
             }
         }
-        
+
         private async Task Echo(WebSocket webSocket)
         {
             var buffer = new byte[1024 * 4];
@@ -55,15 +57,24 @@ namespace Database.Controllers
             {
                 //string value = await db.StringGetAsync("foo");
                 //Console.WriteLine(value);
-                var inputString = Encoding.UTF8.GetString(buffer);
-                var vehicleData = JsonSerializer.Deserialize<BaseTelemetry>(inputString);
-                var vehicleId = vehicleData.Id;
+                //string inputString = Encoding.UTF8.GetString(buffer);
 
-                //var serverMsg = Encoding.UTF8.GetBytes($"Server: Hello. You said: {Encoding.UTF8.GetString(buffer)}");
+                // Store JSON as string
+                //string inputString = Encoding.UTF8.GetString(buffer.TakeWhile(x => x != 0).ToArray()); // This also works, not sure which is more efficient
+                string inputString = Encoding.UTF8.GetString(buffer).TrimEnd('\0');
+
+                // Deserialize JSON string
+                Vehicle vehicleData = JsonSerializer.Deserialize<Vehicle>(inputString);
+
+                // Get Vehicle key
+                var vehicleKey = vehicleData.key;
+
+                // Send message back to clients
                 await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
-                // _logger.Log(LogLevel.Information, "Message sent to Client");
 
-                db.StringSet(vehicleData?.Name, inputString);
+                db.StringSet(vehicleKey, inputString);
+
+                // db.StringSet("test", Encoding.UTF8.GetString(buffer));
 
                 buffer = new byte[1024 * 4];
                 result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);

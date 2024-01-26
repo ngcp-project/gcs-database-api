@@ -1,19 +1,19 @@
-/*using Microsoft.AspNetCore.Mvc;
+// using Microsoft.AspNetCore.Mvc;
 
-namespace Database.Controllers;
+// namespace Database.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
+// [ApiController]
+// [Route("api/[controller]")]
 
-// Template
-// Name file endpoint name + Controller
-public class ExampleController : ControllerBase
-{
-    [HttpGet(Name = "GetWeatherForecast")]
+// // Template
+// // Name file endpoint name + Controller
+// public class ExampleController : ControllerBase
+// {
+//     [HttpGet(Name = "GetWeatherForecast")]
 
-    [HttpPost(Name = "GetWeatherForecast")]
+//     [HttpPost(Name = "GetWeatherForecast")]
 
-    [HttpGet]
+//     [HttpGet]
 
-    [HttpPost]
-}*/
+//     [HttpPost]
+// }
