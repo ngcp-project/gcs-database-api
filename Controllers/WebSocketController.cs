@@ -40,7 +40,13 @@ namespace Database.Controllers
                 // Tie a callback function with type `EventHandler<BasicDeliveryEventArgs> to the consumer`                
                 _rabbitmq.consumer.Received += async (channel, eventArgs) => 
                 {
-                    var body = eventArgs.Body.ToString();
+                    var body = eventArgs.Body.ToString().TrimEnd('\0'); //Handle null terminated strings
+
+                    // Deserialize JSON string
+                    Vehicle vehicleData = JsonSerializer.Deserialize<Vehicle>(inputString);
+
+                    // Get Vehicle key
+                    var vehicleKey = vehicleData.key;
 
                     await ws.SendAsync(
                         new ArraySegment<byte>(eventArgs.Body.ToArray()),
@@ -48,6 +54,9 @@ namespace Database.Controllers
                         true,
                         CancellationToken.None
                     );
+
+                    // Update vehicle data in database
+                    db.StringSet(vehicleKey, inputString);
                 };
 
                 // Stop listening to the specific client when specified
