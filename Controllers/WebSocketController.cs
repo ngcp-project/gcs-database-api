@@ -1,88 +1,73 @@
-using System;
-using System.Net;
 using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Text.Json;
-using Database.Models;
-
+using System.Text;
 using StackExchange.Redis;
-using Microsoft.Extensions.Primitives;
+using Database.Interfaces;
+using Database.Handlers;
+using RabbitMQ.Client.Events;
 
 namespace Database.Controllers
 {
-
-    [ApiController]
-    [Route("[controller]")]
     public class WebSocketController : ControllerBase
     {
-        private new const int BadRequest = ((int)HttpStatusCode.BadRequest);
         private readonly ILogger<WebSocketController> _logger;
+        private readonly IDatabase _redis;
+        private readonly RabbitMqConsumer _rabbitmq;
 
-        private ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
-        private IDatabase db;
-
-        public WebSocketController(ILogger<WebSocketController> logger)
+        public WebSocketController(
+            ILogger<WebSocketController> logger, 
+            IConnectionMultiplexer redis,
+            RabbitMqConsumer rabbitmq)
         {
             _logger = logger;
-            db = redis.GetDatabase();
+            _redis = redis.GetDatabase();
+            _rabbitmq = rabbitmq;
         }
 
-        [Route("/ws")]
-        public async Task Get()
-        {
 
+        [HttpGet("/ws/{vehicleName}")]
+        public async Task GetTelemetry(string vehicleName)
+        {
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
-                using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                _logger.Log(LogLevel.Information, "WebSocket connection established");
-                await Echo(webSocket);
+                using WebSocket ws = await HttpContext.WebSockets.AcceptWebSocketAsync();
+                string queueName = $"telemetry_{vehicleName.ToLower()}";
+
+                _logger.Log(LogLevel.Information, "\nWebsocket connection established!\n");
+                _logger.Log(LogLevel.Information, "\nQueue: " + queueName);
+                _rabbitmq.QueueDeclare(queueName);
+                _rabbitmq.StartConsuming(queueName);
+                // Tie a callback function with type `EventHandler<BasicDeliveryEventArgs> to the consumer`                
+                _rabbitmq.consumer.Received += async (channel, eventArgs) => 
+                {
+                    var body = eventArgs.Body.ToString();
+
+                    await ws.SendAsync(
+                        new ArraySegment<byte>(eventArgs.Body.ToArray()),
+                        WebSocketMessageType.Text,
+                        true,
+                        CancellationToken.None
+                    );
+                };
+
+                // Stop listening to the specific client when specified
+                while (true) 
+                {
+                    if (ws.State == WebSocketState.Open)
+                    {
+                        Thread.Sleep(100);
+                    }
+                    else if (ws.State == WebSocketState.Closed || ws.State == WebSocketState.Aborted)
+                    {
+                        _logger.Log(LogLevel.Error, "Websocket connection aborted!");
+                        _rabbitmq.StopListening();
+                        break;
+                    }
+
+                }
             }
-            else
-            {
-                HttpContext.Response.StatusCode = BadRequest;
-            }
+            else HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
         }
 
-        private async Task Echo(WebSocket webSocket)
-        {
-            var buffer = new byte[1024 * 4];
-            var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            _logger.Log(LogLevel.Information, "Message received from Client");
-
-            while (!result.CloseStatus.HasValue)
-            {
-                //string value = await db.StringGetAsync("foo");
-                //Console.WriteLine(value);
-                //string inputString = Encoding.UTF8.GetString(buffer);
-
-                // Store JSON as string
-                //string inputString = Encoding.UTF8.GetString(buffer.TakeWhile(x => x != 0).ToArray()); // This also works, not sure which is more efficient
-                string inputString = Encoding.UTF8.GetString(buffer).TrimEnd('\0');
-
-                // Deserialize JSON string
-                Vehicle vehicleData = JsonSerializer.Deserialize<Vehicle>(inputString);
-
-                // Get Vehicle key
-                var vehicleKey = vehicleData.key;
-
-                // Send message back to clients
-                await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
-
-                db.StringSet(vehicleKey, inputString);
-
-                // db.StringSet("test", Encoding.UTF8.GetString(buffer));
-
-                buffer = new byte[1024 * 4];
-                result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                _logger.Log(LogLevel.Information, "Message received from Client");
-            }
-
-            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-            _logger.Log(LogLevel.Information, "WebSocket connection closed");
-        }
     }
 }
