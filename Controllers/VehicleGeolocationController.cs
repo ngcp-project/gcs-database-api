@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace Database.Controllers
+namespace ngcp.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
