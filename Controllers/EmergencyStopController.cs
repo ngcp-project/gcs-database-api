@@ -8,13 +8,9 @@ namespace Database.Controllers;
 // // Name file endpoint name + Controller
 public class EmergencyStopController : ControllerBase
 {
-    [HttpGet(Name = "GetEmergencyStop")]
-    public async Task GetEmergencyStopAsync(){
-        
-    }
-
-    [HttpPost(Name = "PutEmergencyStop")]
-    public async Tast PutEmergencyStop(){
+    
+    [HttpPost(Name = "PostEmergencyStop")]
+    public async Task PostEmergencyStop(){
 
     }
     
