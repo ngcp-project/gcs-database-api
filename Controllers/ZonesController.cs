@@ -1,15 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
 
-
     public class ZonesController : ControllerBase
     {
         private ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
         private readonly IDatabase _redis;
 
-        public ZonesController (
-           
-        ) {
+        public ZonesController () {
             _redis = redis.GetDatabase();
         }
 
