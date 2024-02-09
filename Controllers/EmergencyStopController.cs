@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis;
 
 namespace Database.Controllers;
 
@@ -11,7 +12,9 @@ public class EmergencyStopController : ControllerBase
     
     [HttpPost(Name = "PostEmergencyStop")]
     public async Task PostEmergencyStop(){
-
+        ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("local:redis:6379");
+        IDatabase gcs = redis.GetDatabase();
+        gcs.StringSet("EmergencyStop", "true");
     }
     
 
