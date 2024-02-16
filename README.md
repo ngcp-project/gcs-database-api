@@ -20,11 +20,11 @@ This is the primary codebase for the GCS database and its API.
 9. Run `node client.js` to test connection  
    9a. This will start an endless loop of updating the number in the DB, push Crtl/Command + C to stop the script whenever
 10. Open Redis Commander and log in to access DB on the browser
-10a. The Login Information for Redis Commander to see database information is under `.env`
+   10a. The Login Information for Redis Commander to see database information is under `.env`
 11. You should now see the string with the last number sent using the js script
 
-For Docket Setup:
-1. create .env file if it doesn't alrady exist. 
-2. enter the following line into the CLI: docker-compose up --detach
-3. dotnet run
+For Docker Setup:
+1. Create .env file if it doesn't alrady exist using format provided in  .env.sample
+2. Enter the following line into the CLI: docker-compose up --detach
+3. `dotnet run` in console
 4. Open Redis Commander and log in
