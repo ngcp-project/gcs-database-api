@@ -13,7 +13,7 @@ public class ZonesController : ControllerBase
         _redis = redis.GetDatabase();
     }
 
-    [HttpGet("zones/{keepIn}")]
+    [HttpGet("zones/in")]
     public String getInZones()
     {
         // return keep-in zones
