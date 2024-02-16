@@ -2,9 +2,8 @@ using System.Net.WebSockets;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using StackExchange.Redis;
-using Database.Interfaces;
-using Database.Handlers;
 using RabbitMQ.Client.Events;
+using Database.Handlers;
 
 namespace Database.Controllers
 {
@@ -38,7 +37,7 @@ namespace Database.Controllers
                 _rabbitmq.QueueDeclare(queueName);
                 _rabbitmq.StartConsuming(queueName);
                 // Tie a callback function with type `EventHandler<BasicDeliveryEventArgs> to the consumer`                
-                _rabbitmq.consumer.Received += async (channel, eventArgs) => 
+                _rabbitmq.Consumer.Received += async (channel, eventArgs) => 
                 {
                     var body = eventArgs.Body.ToString();
 
