@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Database.Models;
 
-namespace ngcp.Models
+namespace Database.Models
 {
     public class VehicleGelocation
     {
