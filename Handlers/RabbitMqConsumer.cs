@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -25,13 +21,21 @@ public class RabbitMqConsumer
         _channel = factory.CreateConnection().CreateModel();
     }
 
-    public void QueueDeclare(string queue) {
-        _channel.QueueDeclarePassive(queue);
+    public void CreateConsumer(string queue) 
+    {
+        _channel.QueueDeclare(
+            queue: queue,
+            durable: false,
+            exclusive: false,
+            autoDelete: false,
+            arguments: null
+        );
+
+        Consumer = new EventingBasicConsumer(_channel);
     }
 
-    public void StartConsuming(string queue) {
-        Consumer = new EventingBasicConsumer(_channel);
-
+    public void StartConsuming(string queue) 
+    {
         _channel.BasicConsume(
             queue: queue,
             autoAck: true,
@@ -39,7 +43,8 @@ public class RabbitMqConsumer
         );
     }
 
-    public void StopListening() {
+    public void StopConsuming() 
+    {
         _channel.Close();
     }
 }
