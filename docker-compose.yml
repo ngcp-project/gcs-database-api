@@ -12,8 +12,8 @@ services:
     image: rediscommander/redis-commander:latest
     environment:
       - REDIS_HOSTS=local:redis:6379
-      - HTTP_USER=root
-      - HTTP_PASSWORD=1234
+      - HTTP_USER=${USER_NAME:?error}
+      - HTTP_PASSWORD=${PASSWD:?error}
     ports:
       - 8081:8081
     depends_on:
