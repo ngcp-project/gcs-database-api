@@ -29,4 +29,4 @@ For Docker Setup:
 3. `dotnet run` in console
 4. Open Redis Commander and log in
 
-[![Super-Linter](https://github.com/Jason/gcs-database-api/actions/workflows/linter.yaml/badge.svg)](https://github.com/marketplace/actions/super-linter)
+![Super-Linter](https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/actions/workflows/linter.yaml/badge.svg)
