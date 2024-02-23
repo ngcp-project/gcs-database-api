@@ -31,4 +31,8 @@ jobs:
         env:
           # To report GitHub Actions status checks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OUTPUT_FOLDER: Linter_Report
+          #only check for changed file
+          #VALIADATE_ALL_CODEBASE: false
+
 ...
