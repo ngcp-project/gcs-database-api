@@ -28,3 +28,5 @@ For Docker Setup:
 2. Enter the following line into the CLI: docker-compose up --detach
 3. `dotnet run` in console
 4. Open Redis Commander and log in
+
+[![Super-Linter](https://github.com/<OWNER>/<REPOSITORY>/actions/workflows/<WORKFLOW_FILE_NAME>/badge.svg)](https://github.com/marketplace/actions/super-linter)
