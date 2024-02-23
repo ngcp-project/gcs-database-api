@@ -43,7 +43,7 @@ namespace Database.Controllers
             }
             else
             {
-                HttpContext.Response.StatusCode = BadRequest;
+HttpContext.Response.StatusCode = BadRequest;
             }
         }
 
