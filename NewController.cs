@@ -19,7 +19,7 @@ public NewController(ILogger<NewController> logger)
 
         public IActionResult Index()
         {
-    return View();
+    cd return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
