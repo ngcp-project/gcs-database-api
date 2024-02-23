@@ -3,10 +3,11 @@ name: Lint
 
 on:  # yamllint disable-line rule:truthy
   push:
-    branches-ignore: [master]
+    branches-ignore: []
   pull_request: 
-    branches: [master]
+    branches: [origin/main]
 
+permissions: read-all
 jobs:
   build:
     name: Lint
