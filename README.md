@@ -3,7 +3,7 @@
 This is the primary codebase for the GCS database and its API.
 
 ## To Set up WebSocket:
-HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+
 1. Pull code
 2. Open folder in vscode
 3. Open Docker Desktop and start redis servers
