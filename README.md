@@ -28,3 +28,6 @@ For Docker Setup:
 2. Enter the following line into the CLI: docker-compose up --detach
 3. `dotnet run` in console
 4. Open Redis Commander and log in
+
+## Running Tests
+`cd Tests | dotnet test`
