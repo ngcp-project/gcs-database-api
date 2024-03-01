@@ -5,19 +5,19 @@ let webSocket = new WebSocket('ws://localhost:5135/ws');
 
 // Sample Vehicle data
 let vehicleData = {
-        key: "Vehicle 2",
-        speed: 1.1,
-        pitch: 2.2,
-        yaw: 3.3,
-        roll: 4.4,
-        altitude: 5.5,
-        batteryLife: 6.6,
-        lastUpdated: "00:00:00",
-        currentPosition: {
-            latitude: 7.7,
-            longitude: 8.8
+        "key": "Vehicle 2",
+        "speed": 1.1,
+        "pitch": 2.2,
+        "yaw": 3.3,
+        "roll": 4.4,
+        "altitude": 5.5,
+        "batteryLife": 6.6,
+        "lastUpdated": "00:00:00",
+        "currentPosition": {
+            "latitude": 7.7,
+            "longitude": 8.8
         },
-        vehicleStatus: 0
+        "vehicleStatus": 0
 };      
 
 setTimeout(() => {

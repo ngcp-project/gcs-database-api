@@ -1,6 +1,8 @@
 # GCS Database API
 
 This is the primary codebase for the GCS database and its API.
+linter
+![Super-Linter](https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/actions/workflows/linter.yaml/badge.svg)
 
 ## To Set up WebSocket:
 
@@ -29,4 +31,32 @@ For Docker Setup:
 3. `dotnet run` in console
 4. Open Redis Commander and log in
 
-![Super-Linter](https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/actions/workflows/linter.yaml/badge.svg)
+## Running Tests
+`cd Tests | dotnet test`
+
+## [Documentation comments](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/)
+
+### Summary
+```
+/**
+ * <summary>
+ *    This class performs an important function.
+ * </summary>
+ */
+public class MyClass { }
+```
+
+### Summary + Parameters + Return
+```
+/**
+* <summary>
+*  Enter description here for the second constructor.
+*  ID string generated is "M:MyNamespace.MyClass.#ctor(System.Int32)".
+* </summary>
+* <param name="i">Describe parameter.</param>
+* <param name="ptr">Describe parameter.</param>
+* <returns>Describe return value.</returns
+*/
+public int SomeMethod(int i, void* ptr) {return 1;}
+```
+main
