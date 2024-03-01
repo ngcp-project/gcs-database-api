@@ -3,7 +3,7 @@ name: Lint
 
 on:  # yamllint disable-line rule:truthy
   push:
-    branches-ignore: []
+    branches-ignore: [origin/main]
   pull_request: 
     branches: [origin/main]
 
@@ -33,7 +33,14 @@ jobs:
           # To report GitHub Actions status checks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OUTPUT_FOLDER: Linter_Report
+          OUTPUT_DETAILS: detailed
+
           #only check for changed file
           #VALIADATE_ALL_CODEBASE: false
+          #ignore linting for certain file type
+          VALIDATE_ENV: false
+          VALIDATE_MARKDOWN: false
+          
+          
 
 ...
