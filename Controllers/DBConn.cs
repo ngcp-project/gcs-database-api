@@ -9,7 +9,7 @@ public sealed class DBConn
     private DBConn() {}
     private ConnectionMultiplexer conn { get; set;}
 
-    public static ConnectionMultiplexer Instance()
+    public static DBConn Instance()
     {
         if (_instance == null)
         {
@@ -22,7 +22,7 @@ public sealed class DBConn
                 }
             }
         }
-        return _instance.getConn();
+        return _instance;
     }
 
     public ConnectionMultiplexer getConn() {

@@ -1,7 +1,6 @@
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
-using StackExchange.Redis;
 
 public class ZonesController : ControllerBase
 {
@@ -10,7 +9,7 @@ public class ZonesController : ControllerBase
 
     public ZonesController()
     {
-        conn = DBConn.Instance();
+        conn = DBConn.Instance().getConn();
         _redis = conn.GetDatabase();
     }
 
@@ -48,5 +47,16 @@ public class ZonesController : ControllerBase
         }
     }
 
+    // [HttpDelete("zones/in")]
+    // public async Task delKeepIn(string key)
+    // {
+    //     return key;
+    // }
+
+    // [HttpDelete("zones/out")]
+    // public async Task delKeepOut(string key)
+    // {
+    //     return key;
+    // }
 
 }
