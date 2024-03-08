@@ -1,0 +1,27 @@
+using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis;
+
+namespace Database.Controllers;
+
+
+// Template
+// Name file endpoint name + Controller
+public class ExampleController : ControllerBase
+{
+    [HttpGet("example")]
+    public String getExample()
+    {
+        . . .
+        return _redis.StringGet("example"); // Replace "example" with the respective database key
+    }
+
+    [HttpPost("example")]
+    public async Task postExample()
+    {
+        using (var sr = new StreamReader(Request.Body))
+        {
+            var content = await sr.ReadToEndAsync();
+            await _redis.StringSetAsync("example", content); // Replace "example" with the respective database key
+        }
+    }
+}

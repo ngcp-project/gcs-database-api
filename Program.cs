@@ -1,3 +1,4 @@
+using Database.Handlers;
 using StackExchange.Redis;
 
 
@@ -7,6 +8,12 @@ using StackExchange.Redis;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddSingleton<IConnectionMultiplexer>(c =>
+{
+    return ConnectionMultiplexer.Connect("localhost");
+});
+
+builder.Services.AddScoped<RabbitMqConsumer>();
 
 builder.Services.AddControllers();
 
@@ -20,9 +27,7 @@ var app = builder.Build();
 //     app.UseSwagger();
 //     app.UseSwaggerUI();
 // }
-
-app.UseHttpsRedirection();
- app.UseWebSockets();
+app.UseWebSockets();
 
 app.UseAuthorization();
 
