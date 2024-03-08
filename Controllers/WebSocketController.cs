@@ -68,7 +68,7 @@ namespace Database.Controllers
         }
 
         private async Task ListenToRabbitMq(WebSocket ws, string queueName, CancellationToken cancellationToken)
-        {
+        {   
             // Add a callback function to RabbitMQ
             // NOTE: This will be triggered whenever a RabbitMQ message is received
             _rabbitmq.Consumer.Received += async (channel, eventArgs) =>
@@ -88,7 +88,7 @@ namespace Database.Controllers
                 // Get Vehicle key
                 var vehicleKey = vehicleData.key;
 
-                _logger.Log(LogLevel.Information, "Sending WebSocket message...");
+                _logger.Log(LogLevel.Information, "Saved vehicle data to database!");
                 // Save to database
                 _redis.StringSet(vehicleKey, body);
 
