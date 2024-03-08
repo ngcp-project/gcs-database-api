@@ -31,3 +31,29 @@ For Docker Setup:
 
 ## Running Tests
 `cd Tests | dotnet test`
+
+## [Documentation comments](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/)
+
+### Summary
+```
+/**
+ * <summary>
+ *    This class performs an important function.
+ * </summary>
+ */
+public class MyClass { }
+```
+
+### Summary + Parameters + Return
+```
+/**
+* <summary>
+*  Enter description here for the second constructor.
+*  ID string generated is "M:MyNamespace.MyClass.#ctor(System.Int32)".
+* </summary>
+* <param name="i">Describe parameter.</param>
+* <param name="ptr">Describe parameter.</param>
+* <returns>Describe return value.</returns
+*/
+public int SomeMethod(int i, void* ptr) {return 1;}
+```
