@@ -73,15 +73,18 @@ namespace Database.Controllers
             // NOTE: This will be triggered whenever a RabbitMQ message is received
             _rabbitmq.Consumer.Received += async (channel, eventArgs) =>
             {
-                var body = eventArgs.Body.ToString().TrimEnd('\0');
+                var body = eventArgs.Body.ToArray();
+                var inputString = Encoding.UTF8.GetString(body).TrimEnd('\0');
                 // Deserialize JSON String
                 Vehicle vehicleData = new Vehicle();
 
+                _logger.Log(LogLevel.Information, inputString);
+
                 try {
-                    vehicleData = JsonSerializer.Deserialize<Vehicle>(body);
+                    vehicleData = JsonSerializer.Deserialize<Vehicle>(inputString);
                 }
                 catch (Exception e) {
-                    _logger.Log(LogLevel.Error, e.Message);
+                    _logger.Log(LogLevel.Error, "Error: " + e.Message);
                     return;
                 }
 
@@ -90,7 +93,7 @@ namespace Database.Controllers
 
                 // Save vehicle data to database
                 _logger.Log(LogLevel.Information, "Saving vehicle data to database!");
-                _redis.StringSet(vehicleKey, body);
+                _redis.StringSet(vehicleKey, inputString);
 
                 _logger.Log(LogLevel.Information, "Sending WebSocket message...");
 
