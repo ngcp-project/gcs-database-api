@@ -5,6 +5,8 @@ using StackExchange.Redis;
 using RabbitMQ.Client.Events;
 using Database.Handlers;
 using System.IO;
+using System.Text.Json;
+using Database.Models;
 
 namespace Database.Controllers
 {
@@ -73,15 +75,22 @@ namespace Database.Controllers
             {
                 var body = eventArgs.Body.ToString().TrimEnd('\0');
                 // Deserialize JSON String
+                Vehicle vehicleData = new Vehicle();
 
-                Vehicle vehicleData = JsonSerializer.Deserialize<Vehicle>(inputString);
+                try {
+                    vehicleData = JsonSerializer.Deserialize<Vehicle>(body);
+                }
+                catch (Exception e) {
+                    _logger.Log(LogLevel.Error, e.Message);
+                    return;
+                }
 
                 // Get Vehicle key
                 var vehicleKey = vehicleData.key;
 
-                 _logger.Log(LogLevel.Information, "Sending WebSocket message...");
+                _logger.Log(LogLevel.Information, "Sending WebSocket message...");
                 // Save to database
-                _redis.StringSet(vehicleKey, inputString);
+                _redis.StringSet(vehicleKey, body);
 
                 _logger.Log(LogLevel.Information, "Sending WebSocket message...");
 
