@@ -88,8 +88,8 @@ namespace Database.Controllers
                 // Get Vehicle key
                 var vehicleKey = vehicleData.key;
 
-                _logger.Log(LogLevel.Information, "Saved vehicle data to database!");
-                // Save to database
+                // Save vehicle data to database
+                _logger.Log(LogLevel.Information, "Saving vehicle data to database!");
                 _redis.StringSet(vehicleKey, body);
 
                 _logger.Log(LogLevel.Information, "Sending WebSocket message...");
