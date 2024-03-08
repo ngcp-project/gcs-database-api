@@ -71,7 +71,18 @@ namespace Database.Controllers
             // NOTE: This will be triggered whenever a RabbitMQ message is received
             _rabbitmq.Consumer.Received += async (channel, eventArgs) =>
             {
-                var body = eventArgs.Body.ToString();
+                var body = eventArgs.Body.ToString().TrimEnd('\0');
+                // Deserialize JSON String
+
+                Vehicle vehicleData = JsonSerializer.Deserialize<Vehicle>(inputString);
+
+                // Get Vehicle key
+                var vehicleKey = vehicleData.key;
+
+                 _logger.Log(LogLevel.Information, "Sending WebSocket message...");
+                // Save to database
+                _redis.StringSet(vehicleKey, inputString);
+
                 _logger.Log(LogLevel.Information, "Sending WebSocket message...");
 
                 await ws.SendAsync(
