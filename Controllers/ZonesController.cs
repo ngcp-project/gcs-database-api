@@ -19,19 +19,7 @@ public class ZonesController : ControllerBase
         // return keep-in zones
         return _redis.StringGet("keepIn");
     }
-    [HttpGet("zones/in")]
-    public String getInZones()
-    {
-        // return keep-in zones
-        return _redis.StringGet("keepIn");
-    }
 
-    [HttpGet("zones/out")]
-    public String getOutZones()
-    {
-        // return keep-out zones
-        return _redis.StringGet("keepOut");
-    }
     [HttpGet("zones/out")]
     public String getOutZones()
     {
