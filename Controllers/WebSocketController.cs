@@ -10,6 +10,14 @@ using Database.Models;
 
 namespace Database.Controllers
 {
+    /**
+    * <summary>
+    *   Receives vehicle data from vehicles via RabbitMQ, saves vehicle data to database, and sends
+    *   data to front end via a WebSocket connection.
+    *   <para />
+    *   Note: A WebSocket connection must be established before establishing a RabbitMQ connection. 
+    * </summary>
+    */
     public class WebSocketController : ControllerBase
     {
         private readonly ILogger<WebSocketController> _logger;
@@ -26,7 +34,14 @@ namespace Database.Controllers
             _rabbitmq = rabbitmq;
         }
 
-
+        /**
+        * <summary>
+        *   Establish a WebSocket connection to retrieve vehicle telemetry from backend
+        *   <para />
+        *   Note: A RabbitMQ connection will be established upon a WebSocket connection 
+        * </summary>
+        * <param name="vehicleName">Name of vehicle to retrieve telemetry data</param>
+        */
         [HttpGet("/ws/{vehicleName}")]
         public async Task GetTelemetry(string vehicleName)
         {
@@ -67,6 +82,14 @@ namespace Database.Controllers
             else HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
         }
 
+/**
+        * <summary>
+        *   Establish a WebSocket connection to retrieve vehicle telemetry from backend
+        * </summary>
+        * <param name="ws">Open WebSocket connection</param>
+        * <param name="queueName">RabbitMQ consumer queueName. Format: telemetry_vehiclename (all lowercase)</param>
+        * <param name="cancellationToken">Token used to cancel or dispose of RabbitMQ consumer</param>
+        */
         private async Task ListenToRabbitMq(WebSocket ws, string queueName, CancellationToken cancellationToken)
         {   
             // Add a callback function to RabbitMQ
