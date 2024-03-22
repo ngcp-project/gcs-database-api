@@ -41,13 +41,15 @@ For Docker Setup:
 ## [Documentation comments](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/)
 
 ## Linting Log Interpretation
-1. Click on the workflow symbol near the top of the codebase to see a summary of the lint
+1. Select the workflow symbol near the top of the codebase to see a summary of the lint
 ![Workflow Symbol](https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/blob/linter/Linter_Documentation/Step1_linter.png)
-2. To see more details on why the lint failed for specific programming languages, click on the "Details" option
+2. To see more details on why the lint failed for specific programming languages, select the "Details" option
 ![Summary of Lint](https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/blob/linter/Linter_Documentation/Step2_linter.png)
-3. Upon landing in the detailed workflow page, check which languages failed the lint
+3. Upon landing in the detailed workflow page, check which languages failed the lint. Select the dropdown option to see which line(s) in which file(s) failed the lint
 ![Detailed page of failed lint for specific languages](https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/blob/linter/Linter_Documentation/Step3_linter.png)
-4. 
+4. Lastly, examine what error the code yield in the listed file(s). The first number indicates the line number, the second is the character number within that file.
+![Detailed page of which line in which file contained the linting error](https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/blob/linter/Linter_Documentation/Step4_linter.png)
+
 ### Summary
 ```
 /**
