@@ -42,9 +42,12 @@ For Docker Setup:
 
 ## Linting Log Interpretation
 1. Click on the workflow symbol near the top of the codebase to see a summary of the lint
-!(https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/blob/linter/Linter_Documentation/Step1_linter.png)
+![Workflow Symbol](https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/blob/linter/Linter_Documentation/Step1_linter.png)
 2. To see more details on why the lint failed for specific programming languages, click on the "Details" option
-!(https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/blob/linter/Linter_Documentation/Step2_linter.png)
+![Summary of Lint](https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/blob/linter/Linter_Documentation/Step2_linter.png)
+3. Upon landing in the detailed workflow page, check which languages failed the lint
+![Detailed page of failed lint for specific languages](https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/blob/linter/Linter_Documentation/Step3_linter.png)
+4. 
 ### Summary
 ```
 /**
