@@ -40,9 +40,11 @@ For Docker Setup:
 
 ## [Documentation comments](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/)
 
-##Linting Log Interpretation
-1. Click 
-![Alt text](https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/blob/linter/Linter_Documentation/Step1_linter.png)
+## Linting Log Interpretation
+1. Click on the workflow symbol near the top of the codebase to see a summary of the lint
+!(https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/blob/linter/Linter_Documentation/Step1_linter.png)
+2. To see more details on why the lint failed for specific programming languages, click on the "Details" option
+!(https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/blob/linter/Linter_Documentation/Step2_linter.png)
 ### Summary
 ```
 /**
