@@ -40,6 +40,9 @@ For Docker Setup:
 
 ## [Documentation comments](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/xmldoc/)
 
+##Linting Log Interpretation
+1. Click 
+![Alt text](https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/blob/linter/Linter_Documentation/Step1_linter.png)
 ### Summary
 ```
 /**
