@@ -1,7 +1,7 @@
 # GCS Database API
 
 This is the primary codebase for the GCS database and its API.
-![Super-Linter](https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/actions/workflows/linter.yaml/badge.svg)
+<br>![Super-Linter](https://github.com/Northrop-Grumman-Collaboration-Project/gcs-database-api/actions/workflows/linter.yaml/badge.svg)
 
 ## To Set up WebSocket:
 
