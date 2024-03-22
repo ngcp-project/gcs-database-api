@@ -1,0 +1,46 @@
+---
+name: Lint
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    branches-ignore: [origin/main]
+  pull_request: 
+    branches: [origin/main]
+
+permissions: read-all
+jobs:
+  build:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: read
+      # To report GitHub Actions status checks
+      statuses: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # super-linter needs the full git history to get the
+          # list of files that changed across commits
+          fetch-depth: 0
+
+      - name: Lint Code Base
+        uses: super-linter/super-linter@v6.1.1  # x-release-please-version
+        env:
+          # To report GitHub Actions status checks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OUTPUT_FOLDER: Linter_Report
+          OUTPUT_DETAILS: detailed
+
+          #only check for changed file
+          #VALIADATE_ALL_CODEBASE: false
+          #ignore linting for certain file type
+          VALIDATE_ENV: false
+          VALIDATE_MARKDOWN: false
+          
+          
+
+...
