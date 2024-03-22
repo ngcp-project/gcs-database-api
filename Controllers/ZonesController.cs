@@ -4,12 +4,13 @@ using StackExchange.Redis;
 
 public class ZonesController : ControllerBase
 {
-    private ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
+    private ConnectionMultiplexer conn;
     private readonly IDatabase _redis;
 
     public ZonesController()
     {
-        _redis = redis.GetDatabase();
+        conn = DBConn.Instance().getConn();
+        _redis = conn.GetDatabase();
     }
 
     [HttpGet("zones/in")]
@@ -31,7 +32,7 @@ public class ZonesController : ControllerBase
     {
         using (var sr = new StreamReader(Request.Body))
         {
-            var content = await sr.ReadToEndAsync();
+            string content = await sr.ReadToEndAsync();
             await _redis.StringSetAsync("keepIn", content);
         }
     }
@@ -41,10 +42,21 @@ public class ZonesController : ControllerBase
     {
         using (var sr = new StreamReader(Request.Body))
         {
-            var content = await sr.ReadToEndAsync();
+            string content = await sr.ReadToEndAsync();
             await _redis.StringSetAsync("keepOut", content);
         }
     }
 
+    // [HttpDelete("zones/in")]
+    // public async Task delKeepIn(string key)
+    // {
+    //     return key;
+    // }
+
+    // [HttpDelete("zones/out")]
+    // public async Task delKeepOut(string key)
+    // {
+    //     return key;
+    // }
 
 }
