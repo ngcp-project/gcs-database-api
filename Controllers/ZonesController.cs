@@ -45,9 +45,11 @@ public class ZonesController : ControllerBase
             try
             {
                 Zone json = JsonSerializer.Deserialize<Zone>(contentCopy);
-                json.keepIn = true;
+                // json.keepIn = true;
 
+                Console.WriteLine("Check passed!");
                 await _redis.StringSetAsync("keepIn", content);
+                Console.WriteLine("keepIn set.");
                 return Ok();
             }
             catch (Exception e)
@@ -70,10 +72,13 @@ public class ZonesController : ControllerBase
             // validate fields
             try
             {
+                Console.WriteLine("Testing input...");
                 Zone json = JsonSerializer.Deserialize<Zone>(contentCopy);
-                json.keepIn = false;
+                // json.keepIn = false;
 
-                await _redis.StringSetAsync("keepIn", content);
+                Console.WriteLine("Check passed!");
+                await _redis.StringSetAsync("keepOut", content);
+                Console.WriteLine("keepOut set.");
                 return Ok();
             }
             catch (Exception e)
