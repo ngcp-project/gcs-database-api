@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
 using System.Text.Json;
 using Database.Models;
+using System.Reflection;
 
 public class VehicleStatusController : ControllerBase
 {
@@ -22,33 +23,117 @@ Body format for all posts and gets in this file:
 */
 
     [HttpPost("SetStatusInUse")]
-    public async Task SetStatusInUse(){
-        using (var sr = new StreamReader(Request.Body)){
-            string vehicleData = await sr.ReadToEndAsync();
-            VehicleKey? vehicleKey = JsonSerializer.Deserialize<VehicleKey>(vehicleData);
-            string key = $"{vehicleKey?.Key}-status"; //Status Key Format: [VehicleName]-status
-            await gcs.StringSetAsync(key,  "1"); //enum: 1 = In Use
+    public async Task<IActionResult> SetStatusInUse([FromBody] VehicleKey requestBody)
+    {
+        List<string> missingFields = new List<string>();
+
+        Type type = typeof(VehicleKey); // Replace ExampleModel with the respective model
+        PropertyInfo[] properties = type.GetProperties();
+        foreach (System.Reflection.PropertyInfo property in requestBody.GetType().GetProperties())
+        {
+            var value = property.GetValue(requestBody, null);
+            object defaultValue = null;
+            if (property.PropertyType == typeof(string))
+            {
+                defaultValue = null;
+            }
+            else if (property.PropertyType.IsValueType)
+            {
+                defaultValue = Activator.CreateInstance(property.PropertyType);
+            }
+
+            if (value?.Equals(defaultValue) == true || value == null)
+            {
+                missingFields.Add(property.Name);
+            }
+
         }
+        // Iterates through every property in the model and checks if it is null or default value
+
+        if (missingFields.Count > 0)
+        {
+            return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+        }
+        // If any field is missing, return a bad request
+
+        await gcs.StringSetAsync($"{requestBody.Key}-status", "1"); // Replace "example" with the respective database key
+        return Ok("Status set to In Use");
     }
 
     [HttpPost("SetStatusStandby")]
-    public async Task SetStatusStandby(){
-        using (var sr = new StreamReader(Request.Body)){
-            string vehicleData = await sr.ReadToEndAsync();
-            VehicleKey? vehicleKey = JsonSerializer.Deserialize<VehicleKey>(vehicleData);
-            string key = $"{vehicleKey?.Key}-status";
-            await gcs.StringSetAsync(key,  "2"); //enum: 2 = Stand By
+    public async Task<IActionResult> SetStatusStandby([FromBody] VehicleKey requestBody)
+    {
+        List<string> missingFields = new List<string>();
+
+        Type type = typeof(VehicleKey); // Replace ExampleModel with the respective model
+        PropertyInfo[] properties = type.GetProperties();
+        foreach (System.Reflection.PropertyInfo property in requestBody.GetType().GetProperties())
+        {
+            var value = property.GetValue(requestBody, null);
+            object defaultValue = null;
+            if (property.PropertyType == typeof(string))
+            {
+                defaultValue = null;
+            }
+            else if (property.PropertyType.IsValueType)
+            {
+                defaultValue = Activator.CreateInstance(property.PropertyType);
+            }
+
+            if (value?.Equals(defaultValue) == true || value == null)
+            {
+                missingFields.Add(property.Name);
+            }
+
         }
+        // Iterates through every property in the model and checks if it is null or default value
+
+        if (missingFields.Count > 0)
+        {
+            return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+        }
+        // If any field is missing, return a bad request
+
+        await gcs.StringSetAsync($"{requestBody.Key}-status", "2"); // Replace "example" with the respective database key
+        return Ok("Status set to Standby");
     }
 
     [HttpPost("EmergencyStop")]
-    public async Task EmergencyStop(){
-        using (var sr = new StreamReader(Request.Body)){
-            string vehicleData = await sr.ReadToEndAsync();
-            VehicleKey? vehicleKey = JsonSerializer.Deserialize<VehicleKey>(vehicleData);
-            string key = $"{vehicleKey?.Key}-status";
-            await gcs.StringSetAsync(key,  "3"); //enum: 3 = Emergency Stopped
+    public async Task<IActionResult> EmergencyStop([FromBody] VehicleKey requestBody)
+    {
+        List<string> missingFields = new List<string>();
+
+        Type type = typeof(VehicleKey); // Replace ExampleModel with the respective model
+        PropertyInfo[] properties = type.GetProperties();
+        foreach (System.Reflection.PropertyInfo property in requestBody.GetType().GetProperties())
+        {
+            var value = property.GetValue(requestBody, null);
+            object defaultValue = null;
+            if (property.PropertyType == typeof(string))
+            {
+                defaultValue = null;
+            }
+            else if (property.PropertyType.IsValueType)
+            {
+                defaultValue = Activator.CreateInstance(property.PropertyType);
+            }
+
+            if (value?.Equals(defaultValue) == true || value == null)
+            {
+                missingFields.Add(property.Name);
+            }
+
         }
+        // Iterates through every property in the model and checks if it is null or default value
+
+        if (missingFields.Count > 0)
+        {
+            return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+        }
+        // If any field is missing, return a bad request
+
+        await gcs.StringSetAsync($"{requestBody.Key}-status", "3"); // Replace "example" with the respective database key
+        return Ok("Vehicle Emergency Stopped");
     }
 
     [HttpGet("GetVehicleStatus")]
