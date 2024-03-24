@@ -17,7 +17,7 @@ public class VehicleStatusController : ControllerBase
 --------------Posts and Gets----------------
 Body format for all posts and gets in this file:
 {
-    "Name": "[VehicleName]"
+    "Key": "[VehicleName]"
 }
 */
 
@@ -26,7 +26,7 @@ Body format for all posts and gets in this file:
         using (var sr = new StreamReader(Request.Body)){
             string vehicleData = await sr.ReadToEndAsync();
             VehicleKey? vehicleKey = JsonSerializer.Deserialize<VehicleKey>(vehicleData);
-            string key = $"{vehicleKey?.Name}-status"; //Status Key Format: [VehicleName]-status
+            string key = $"{vehicleKey?.Key}-status"; //Status Key Format: [VehicleName]-status
             await gcs.StringSetAsync(key,  "1"); //enum: 1 = In Use
         }
     }
@@ -36,7 +36,7 @@ Body format for all posts and gets in this file:
         using (var sr = new StreamReader(Request.Body)){
             string vehicleData = await sr.ReadToEndAsync();
             VehicleKey? vehicleKey = JsonSerializer.Deserialize<VehicleKey>(vehicleData);
-            string key = $"{vehicleKey?.Name}-status";
+            string key = $"{vehicleKey?.Key}-status";
             await gcs.StringSetAsync(key,  "2"); //enum: 2 = Stand By
         }
     }
@@ -46,7 +46,7 @@ Body format for all posts and gets in this file:
         using (var sr = new StreamReader(Request.Body)){
             string vehicleData = await sr.ReadToEndAsync();
             VehicleKey? vehicleKey = JsonSerializer.Deserialize<VehicleKey>(vehicleData);
-            string key = $"{vehicleKey?.Name}-status";
+            string key = $"{vehicleKey?.Key}-status";
             await gcs.StringSetAsync(key,  "3"); //enum: 3 = Emergency Stopped
         }
     }
@@ -57,7 +57,7 @@ Body format for all posts and gets in this file:
         using (var sr = new StreamReader(Request.Body)){
             string vehicleData = await sr.ReadToEndAsync();
             VehicleKey? vehicleKey = JsonSerializer.Deserialize<VehicleKey>(vehicleData);
-            string key = $"{vehicleKey?.Name}-status";
+            string key = $"{vehicleKey?.Key}-status";
             num = (int) await gcs.StringGetAsync(key);
         }
         string output; //output string, will be returned. 
