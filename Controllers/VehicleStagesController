@@ -1,0 +1,61 @@
+using Microsoft.AspNetCore.Mvc;
+using StackExchange.redis;
+using System.Net.Http.Headers;
+using System.Text.Json;
+
+namespace Database.Controllers;
+
+
+// return currentStageId, stageName, stageStatus
+// Queries: Vehicle Name enum
+// Endpoint returns the attributes outlined in the schema in the form of stringified JSON
+// Vehicle Name Enum
+
+
+[ApiController]
+[Route("api/[controller]")]
+public class VehicleStagesController : ControllerBase
+{
+   private ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
+   private readonly IDatabase _redis;
+
+
+
+public VehicleStagesController(){
+        conn = DBConn.Instance().getConn()
+        _redis = redis.GetDatabase();
+    }
+
+    
+    [HttpGet("GetVehicleStages")]
+    public async Task<string> GetVehicleStages(){
+        int num = 0; //Default of 0, database value will be read into this variable
+        var jsonObj = new {}
+        using (var sr = new StreamReader(Request.Body)){
+            string vehicleData = await sr.ReadToEndAsync();
+            VehicleStages? jsonData = JsonSerializer.Deserialize<VehicleStages>(vehicleData);
+            jsonObj.currentStageId = $"{VehicleStages?.currentStageId}"
+            jsonObj.stageName = $"{vehicleStages?.stageName}"
+            string key = $"{VehicleStages?.Name}";
+            num = (int) await _redis.StringGetAsync(key);
+        }
+        //"Enum" type
+        switch (num){
+            case 1: 
+                obj.stageStatus = "Not Started";
+                break;
+            case 2:
+                obj.stageStatus = "Initialized";
+                break;
+            case 3:
+                obj.stageStatus = "In Progress";
+                break;
+            default:
+                obj.stageStatus = "Complete";
+                break;
+        }
+    }
+    string jsonString = JsonSerializer.Serializer(obj)
+    return jsonString
+
+}
