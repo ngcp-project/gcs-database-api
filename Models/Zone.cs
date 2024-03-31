@@ -16,14 +16,17 @@ namespace Database.Models
             keepIn = default;
             this.shapeType = shapeType;
             // if (String.Equals(shapeType.ToLower(),"polygon")) {
-            //     Console.WriteLine("polygon");
             //     this.shapeType = ShapeType.polygon;
             // } else if (String.Equals(shapeType.ToLower(),"circle")) {
-            //     Console.WriteLine(" circle");
             //     this.shapeType = ShapeType.circle;
             // }
 
             this.coordinates = coordinates;
+        }
+
+        public override string ToString() {
+            // return data in json format
+            return "{}";
         }
 
     }

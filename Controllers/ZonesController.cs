@@ -1,11 +1,9 @@
-// using System.Net.Http.Headers;
-// using System.Text;
-using System.Text.Json;
-// using System.Text.Json.Nodes;
-// using System.Text.Json.Serialization;
+using System.Reflection;
 using Database.Models;
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
+
+namespace Database.Controllers;
 
 
 public class ZonesController : ControllerBase
@@ -34,60 +32,125 @@ public class ZonesController : ControllerBase
     }
 
     [HttpPost("zones/in")]
-    public async Task<IActionResult> postKeepIn()
+    public async Task<IActionResult> postKeepIn([FromBody] Zone requestBody)
     {
-        using (var sr = new StreamReader(Request.Body))
+        List<string> missingFields = new List<string>();
+
+        Type type = typeof(Zone);
+        PropertyInfo[] properties = type.GetProperties();
+
+        foreach (System.Reflection.PropertyInfo property in requestBody.GetType().GetProperties())
         {
-            string content = await sr.ReadToEndAsync();
-            string contentCopy = content; // copy to validate
-
-            // validate fields
-            try
+            var value = property.GetValue(requestBody, null);
+            object defaultValue = null;
+            if (property.PropertyType == typeof(string))
             {
-                Zone json = JsonSerializer.Deserialize<Zone>(contentCopy);
-                // json.keepIn = true;
-
-                Console.WriteLine("Check passed!");
-                await _redis.StringSetAsync("keepIn", content);
-                Console.WriteLine("keepIn set.");
-                return Ok();
+                defaultValue = null;
             }
-            catch (Exception e)
+            else if (property.PropertyType.IsValueType)
             {
-                Console.WriteLine(e.StackTrace);
-                return BadRequest();
+                defaultValue = Activator.CreateInstance(property.PropertyType);
             }
 
+            if (value?.Equals(defaultValue) == true || value == null)
+            {
+                missingFields.Add(property.Name);
+            }
+
+            if (missingFields.Count > 0)
+            {
+                return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+            }
+            // If any field is missing, return a bad request
+
+            await _redis.StringSetAsync("keepIn", requestBody.ToString()); // Replace "example" with the respective database key
+            return Ok("hi");
+        
         }
-    }
+        // using (var sr = new StreamReader(Request.Body))
+        // {
+        //     string content = await sr.ReadToEndAsync();
+        //     string contentCopy = content; // copy to validate
 
-    [HttpPost("zones/out")]
-    public async Task<IActionResult> postKeepOut()
+        //     // validate fields
+        //     try
+        //     {
+        //         Zone json = JsonSerializer.Deserialize<Zone>(contentCopy);
+        //         // json.keepIn = true;
+
+        //         Console.WriteLine("Check passed!");
+        //         await _redis.StringSetAsync("keepIn", content);
+        //         Console.WriteLine("keepIn set.");
+        //         return Ok();
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         Console.WriteLine(e.StackTrace);
+        //         return BadRequest();
+        //     }
+
+        // }
+    } // end postKeepIn
+
+    [HttpPost("zones/in")]
+    public async Task<IActionResult> postKeepOut([FromBody] Zone requestBody)
     {
-        using (var sr = new StreamReader(Request.Body))
+        List<string> missingFields = new List<string>();
+
+        Type type = typeof(Zone);
+        PropertyInfo[] properties = type.GetProperties();
+
+        foreach (System.Reflection.PropertyInfo property in requestBody.GetType().GetProperties())
         {
-            string content = await sr.ReadToEndAsync();
-            string contentCopy = content;
-
-            // validate fields
-            try
+            var value = property.GetValue(requestBody, null);
+            object defaultValue = null;
+            if (property.PropertyType == typeof(string))
             {
-                Console.WriteLine("Testing input...");
-                Zone json = JsonSerializer.Deserialize<Zone>(contentCopy);
-                // json.keepIn = false;
-
-                Console.WriteLine("Check passed!");
-                await _redis.StringSetAsync("keepOut", content);
-                Console.WriteLine("keepOut set.");
-                return Ok();
+                defaultValue = null;
             }
-            catch (Exception e)
+            else if (property.PropertyType.IsValueType)
             {
-                Console.WriteLine(e.StackTrace);
-                return BadRequest();
+                defaultValue = Activator.CreateInstance(property.PropertyType);
             }
+
+            if (value?.Equals(defaultValue) == true || value == null)
+            {
+                missingFields.Add(property.Name);
+            }
+
+            if (missingFields.Count > 0)
+            {
+                return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+            }
+            // If any field is missing, return a bad request
+
+            await _redis.StringSetAsync("keepOut", requestBody.ToString()); // Replace "example" with the respective database key
+            return Ok("hi");
+        
         }
-    }
+        // using (var sr = new StreamReader(Request.Body))
+        // {
+        //     string content = await sr.ReadToEndAsync();
+        //     string contentCopy = content; // copy to validate
+
+        //     // validate fields
+        //     try
+        //     {
+        //         Zone json = JsonSerializer.Deserialize<Zone>(contentCopy);
+        //         // json.keepIn = true;
+
+        //         Console.WriteLine("Check passed!");
+        //         await _redis.StringSetAsync("keepIn", content);
+        //         Console.WriteLine("keepIn set.");
+        //         return Ok();
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         Console.WriteLine(e.StackTrace);
+        //         return BadRequest();
+        //     }
+
+    } // end postKeepOut
 
     // [HttpDelete("zones/in")]
     // public async Task delKeepIn(string key)
