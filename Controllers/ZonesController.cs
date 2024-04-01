@@ -32,14 +32,14 @@ public class ZonesController : ControllerBase
     }
 
     [HttpPost("zones/in")]
-    public async Task<IActionResult> postKeepIn([FromBody] Zone requestBody)
+    public async Task<IActionResult> PostKeepIn([FromBody] Zone requestBody)
     {
         List<string> missingFields = new List<string>();
 
         Type type = typeof(Zone);
         PropertyInfo[] properties = type.GetProperties();
 
-        foreach (System.Reflection.PropertyInfo property in requestBody.GetType().GetProperties())
+        foreach (System.Reflection.PropertyInfo property in properties)
         {
             var value = property.GetValue(requestBody, null);
             object defaultValue = null;
@@ -62,37 +62,21 @@ public class ZonesController : ControllerBase
                 return BadRequest("Missing fields: " + string.Join(", ", missingFields));
             }
             // If any field is missing, return a bad request
-
-            await _redis.StringSetAsync("keepIn", requestBody.ToString()); // Replace "example" with the respective database key
-            return Ok("hi");
-        
         }
-        // using (var sr = new StreamReader(Request.Body))
-        // {
-        //     string content = await sr.ReadToEndAsync();
-        //     string contentCopy = content; // copy to validate
+        requestBody.keepIn = true;
+        Console.WriteLine(requestBody.zoneShapeType);
 
-        //     // validate fields
-        //     try
-        //     {
-        //         Zone json = JsonSerializer.Deserialize<Zone>(contentCopy);
-        //         // json.keepIn = true;
+        if (requestBody.zoneShapeType == ShapeType.Unknown)
+        {
+            return BadRequest("Invalid shape type");
+        }
 
-        //         Console.WriteLine("Check passed!");
-        //         await _redis.StringSetAsync("keepIn", content);
-        //         Console.WriteLine("keepIn set.");
-        //         return Ok();
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         Console.WriteLine(e.StackTrace);
-        //         return BadRequest();
-        //     }
 
-        // }
+        // await _redis.StringSetAsync("keepIn", requestBody.ToString()); // Replace "example" with the respective database key
+        return Ok("hi");
     } // end postKeepIn
 
-    [HttpPost("zones/in")]
+    [HttpPost("zones/out")]
     public async Task<IActionResult> postKeepOut([FromBody] Zone requestBody)
     {
         List<string> missingFields = new List<string>();
@@ -100,7 +84,7 @@ public class ZonesController : ControllerBase
         Type type = typeof(Zone);
         PropertyInfo[] properties = type.GetProperties();
 
-        foreach (System.Reflection.PropertyInfo property in requestBody.GetType().GetProperties())
+        foreach (System.Reflection.PropertyInfo property in properties)
         {
             var value = property.GetValue(requestBody, null);
             object defaultValue = null;
@@ -123,33 +107,19 @@ public class ZonesController : ControllerBase
                 return BadRequest("Missing fields: " + string.Join(", ", missingFields));
             }
             // If any field is missing, return a bad request
-
-            await _redis.StringSetAsync("keepOut", requestBody.ToString()); // Replace "example" with the respective database key
-            return Ok("hi");
-        
         }
-        // using (var sr = new StreamReader(Request.Body))
-        // {
-        //     string content = await sr.ReadToEndAsync();
-        //     string contentCopy = content; // copy to validate
+        
+        requestBody.keepIn = false;
+        Console.WriteLine(requestBody.zoneShapeType);
 
-        //     // validate fields
-        //     try
-        //     {
-        //         Zone json = JsonSerializer.Deserialize<Zone>(contentCopy);
-        //         // json.keepIn = true;
+        if (requestBody.zoneShapeType == ShapeType.Unknown)
+        {
+            return BadRequest("Invalid shape type");
+        }
 
-        //         Console.WriteLine("Check passed!");
-        //         await _redis.StringSetAsync("keepIn", content);
-        //         Console.WriteLine("keepIn set.");
-        //         return Ok();
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         Console.WriteLine(e.StackTrace);
-        //         return BadRequest();
-        //     }
 
+        // await _redis.StringSetAsync("keepOut", requestBody.ToString()); // Replace "example" with the respective database key
+        return Ok("hi");
     } // end postKeepOut
 
     // [HttpDelete("zones/in")]
