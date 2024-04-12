@@ -27,10 +27,6 @@ For Docker Setup:
 1. Create .env file if it doesn't alrady exist using format provided in  .env.sample
 2. Enter the following line into the CLI: docker-compose up --detach
 3. `dotnet run` in console
-For Docker Setup:
-1. Create .env file if it doesn't alrady exist using format provided in  .env.sample
-2. Enter the following line into the CLI: docker-compose up --detach
-3. `dotnet run` in console
 4. Open Redis Commander and log in
 
 ## Running Tests
