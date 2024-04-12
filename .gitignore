@@ -478,3 +478,5 @@ $RECYCLE.BIN/
 *.lnk
 pnpm-lock.yaml
 .env
+
+test/
