@@ -45,7 +45,7 @@ namespace Database.Models
             }
 
             // return data to post in json format
-            return $"{{\n\"name\": {this.name},\n \"shape\": {this.shapeType},\n \"coordinates\": {coordinatesString}\n}}";
+            return $"{{\n\"name\": {this.name},\n \"shapeType\": {this.shapeType},\n \"coordinates\": {coordinatesString}\n}}";
         }
 
     }

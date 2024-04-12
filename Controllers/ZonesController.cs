@@ -70,7 +70,8 @@ public class ZonesController : ControllerBase
         }
 
 
-        await _redis.StringSetAsync("keepIn", requestBody.ToString()); // Replace "example" with the respective database key
+        // await _redis.StringSetAsync("keepIn", requestBody.ToString()); // Replace "example" with the respective database key
+        await _redis.StringAppendAsync("keepIn", requestBody.ToString());
         return Ok("Posted keepIn zone successfully.");
     } // end postKeepIn
 
@@ -116,18 +117,19 @@ public class ZonesController : ControllerBase
         }
 
 
-        await _redis.StringSetAsync("keepOut", requestBody.ToString()); // Replace "example" with the respective database key
+        // await _redis.StringSetAsync("keepOut", requestBody.ToString()); // Replace "example" with the respective database key
+        await _redis.StringAppendAsync("keepOut", requestBody.ToString());
         return Ok("Posted keepOut zone successfully.");
     } // end postKeepOut
 
     // [HttpDelete("zones/in")]
-    // public async Task delKeepIn(string key)
+    // public async Task delKeepIn([FromBody] Zone requestBody)
     // {
     //     return key;
     // }
 
     // [HttpDelete("zones/out")]
-    // public async Task delKeepOut(string key)
+    // public async Task delKeepOut([FromBody] Zone requestBody)
     // {
     //     return key;
     // }
