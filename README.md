@@ -9,9 +9,9 @@ This is the primary codebase for the GCS database and its API.
 3. Open Docker Desktop and start redis servers
 4. In vscode, open a terminal (if not already open, press Crtl + \` or Command + \`)
 5. Check Dependencies  
-   5a. Make sure you have .NET installed (https://dotnet.microsoft.com/en-us/download/dotnet/7.0)  
+   5a. Make sure you have .NET 7.0.305 installed (https://dotnet.microsoft.com/en-us/download/dotnet/7.0)  
    5b. Make sure you have Node js installed (https://nodejs.org/en/download)  
-   5c. Make sure you have NuGet packet manager extension installed in vscode  
+   5c. Make sure you have NuGet packet manager and NuGet Gallery extension installed in vscode  
    5d. In vscode, Crtl/Command + Shift + P -> NuGet: Open NuGet Gallery  
    5e. Search and install StackExchange.Redis
 6. Open terminal with Crtl/Command + `
