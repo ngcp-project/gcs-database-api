@@ -55,7 +55,6 @@ public VehicleStagesController(){
                 break;
         }
     }
-    string jsonString = JsonSerializer.Serializer(obj)
-    return jsonString
+    return JsonSerializer.Serializer(obj)
 
 }
