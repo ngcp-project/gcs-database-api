@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace gcs-database-api.Models
-{
+namespace Database.Models{
     public class MissionInfo
     {
 

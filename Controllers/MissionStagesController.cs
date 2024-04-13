@@ -1,7 +1,11 @@
+using System.Net.WebSockets;
 using Microsoft.AspNetCore.Mvc;
-using StackExchange.redis;
 using System.Net.Http.Headers;
+using StackExchange.Redis;
+using Database.Handlers;
 using System.Text.Json;
+using System.IO;
+
 
 namespace Database.Controllers;
 
@@ -9,14 +13,14 @@ namespace Database.Controllers;
 [Route("api/[controller]")]
 public class MissionStagesController : ControllerBase
 {
-   private ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
-   private readonly IDatabase _redis;
+        private ConnectionMultiplexer conn;
 
+        private readonly IDatabase _redis;
+public MissionStagesController(IConnectionMultiplexer redis){
 
+        conn = DBConn.Instance().getConn();
 
-public MissionStagesController(){
-        conn = DBConn.Instance().getConn()
-        _redis = redis.GetDatabase();
+        _redis = conn.GetDatabase();
     }
 
     
@@ -30,18 +34,19 @@ public MissionStagesController(){
 
         string key = $"missionStage-{stageID}";
         var missionStageDataStr = await _redis.GetDatabase().StringGetAsync(key);
-        var jsonData = JsonSerializer.Deserialize<VehicleStages>(redisValue);
+        var jsonData = JsonSerializer.Deserialize<MissionStages>(missionStageDataStr);
 
+         var response = new
+                {
+                    jsonData.Key,
+                    jsonData.StageName,
+                    jsonData.StageStatus,
+                    jsonData.VehicleKeys
+                };
 
-        var responseObj = new
-            {
-                jsonData.CurrentStageId,
-                jsonData.StageName,
-                jsonData.stageStatus
-                jsonData.vehicleKeys = jsonObj.vehicleKeys
-            };
+                
+    return JsonSerializer.Serializer(response);
 
     }
-    return JsonSerializer.Serializer(jsonObj)
 
 }

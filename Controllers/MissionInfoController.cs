@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using StackExchange.redis;
 using System.Net.Http.Headers;
+using System.Text;
+using StackExchange.Redis;
+using Database.Handlers;
 using System.Text.Json;
 
 namespace Database.Controllers;
@@ -8,16 +10,18 @@ namespace Database.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class MissionInfo : ControllerBase
+public class MissionInfoController : ControllerBase
 {
-   private ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
-   private readonly IDatabase _redis;
+    private ConnectionMultiplexer conn;
+    private readonly IDatabase _redis;
 
 
 
-public MissionInfo(){
-        conn = DBConn.Instance().getConn()
-        _redis = redis.GetDatabase();
+public MissionInfoController(){
+        conn = DBConn.Instance().getConn();
+
+        _redis = conn.GetDatabase();
+        
     }
 
     
