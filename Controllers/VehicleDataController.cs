@@ -64,8 +64,8 @@ public class VehicleDataController : ControllerBase
         }
         // If any field is missing, return a bad request
 
-        await _redis.StringSetAsync("vehicleData", requestBody.ExampleString); // Replace "example" with the respective database key
-        return Ok("hi");
+        await _redis.StringSetAsync("vehicleData", content); // Replace "example" with the respective database key
+        return Ok("done!");
     }
 
 }
