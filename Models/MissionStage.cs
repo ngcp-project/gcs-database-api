@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Database.Models
+namespace gcs-database-api.Models
 {
-    public class VehicleStages
+    public class MissionStage
     {
         public string Key {get; set;}
-        public int currentStageId {get; set;}
         public string stageName {get; set;}
-        public int stageStatus {get; set;}
-        
+        public STAGE_ENUM stageStatus {get; set;}
+
+        public VehicleGeoData[] vehicleKeys {get; set;}
     }
 }
