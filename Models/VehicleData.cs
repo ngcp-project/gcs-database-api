@@ -6,13 +6,14 @@ using Database.Models;
 
 namespace Database.Models
 {
-    public class VehicleGelocation
+    public class VehicleData
     {
         public bool IsManual { get; set; } = true;
 
         public Coordinate Target { get; set; }
 
         //need shape class
-        public int SearchArea { get; set; }
+        public Shape SearchArea { get; set; }
+        
     }
 }
