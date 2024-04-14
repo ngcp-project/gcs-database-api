@@ -9,6 +9,11 @@ public sealed class DBConn
     private DBConn() {}
     private ConnectionMultiplexer conn { get; set;}
 
+/**
+ * <summary>
+ *    This construction only makes a DB connection if one doesn't exist yet.
+ * </summary>
+ */
     public static DBConn Instance()
     {
         if (_instance == null)
@@ -25,6 +30,11 @@ public sealed class DBConn
         return _instance;
     }
 
+/**
+ * <summary>
+ *    This function returns the current connection.
+ * </summary>
+ */
     public ConnectionMultiplexer getConn() {
         return _instance.conn;
     }
