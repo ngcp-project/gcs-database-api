@@ -1,12 +1,18 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
+
 
 namespace Database.Models{
     public class MissionStages
     {
-        public string Key {get; set;}
+        // public MissionStages(string key, string stageName, Stage_Enum stageStatus){
+        //     this.Key = key;
+        //     this.stageName = stageName;
+        //     this.stageStatus = stageStatus;
+        // }
+
+
+        public string key {get; set;}
         public string stageName {get; set;}
         public Stage_Enum stageStatus {get; set;}
 
