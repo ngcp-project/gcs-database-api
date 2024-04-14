@@ -1,0 +1,8 @@
+namespace Database.Models{
+
+    public class ExampleModel
+    {
+        public string ExampleString { get; set; }
+        public int ExampleInt { get; set; }
+    }
+}
