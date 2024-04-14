@@ -14,58 +14,53 @@ public class VehicleDataController : ControllerBase
         conn = DBConn.Instance().getConn();
         _redis = conn.GetDatabase();
     }
-    [HttpGet("vehicledata/get")]
+    [HttpGet("vehicleData")]
     public String getVehicleData()
     {
         // return vehicle data
         return _redis.StringGet("vehicleData");
     }
 
-    [HttpPost("vehicledata/post")]
-    public async Task postVehicleData()
-    {
-        using (var sr = new StreamReader(Request.Body))
-        {
-            var content = await sr.ReadToEndAsync();
-            await _redis.StringSetAsync("vehicleData", content);
-        }
-    }
-    [HttpPost("example")]
-    public async Task<IActionResult> PostExample([FromBody] ExampleModel requestBody)
-    {
-        List<string> missingFields = new List<string>();
+    // [HttpPost("vehicleData")]
+    // public async Task<IActionResult> postVehicleData([FromBody] VehicleData requestBody)
+    // {
+    //     List<string> missingFields = new List<string>();
 
-        Type type = typeof(VehicleData); // Replace ExampleModel with the respective model
-        PropertyInfo[] properties = type.GetProperties();
-        foreach (System.Reflection.PropertyInfo property in requestBody.GetType().GetProperties())
-        {
-            var value = property.GetValue(requestBody, null);
-            object defaultValue = null;
-            if (property.PropertyType == typeof(string))
-            {
-                defaultValue = null;
-            }
-            else if (property.PropertyType.IsValueType)
-            {
-                defaultValue = Activator.CreateInstance(property.PropertyType);
-            }
+    //     Type type = typeof(VehicleData); // Replace ExampleModel with the respective model
+    //     PropertyInfo[] properties = type.GetProperties();
+    //     foreach (System.Reflection.PropertyInfo property in requestBody.GetType().GetProperties())
+    //     {
+    //         var value = property.GetValue(requestBody, null);
+    //         object defaultValue = null;
+    //         if (property.PropertyType == typeof(string))
+    //         {
+    //             defaultValue = null;
+    //         }
+    //         else if (property.PropertyType.IsValueType)
+    //         {
+    //             defaultValue = Activator.CreateInstance(property.PropertyType);
+    //         }
 
-            if (value?.Equals(defaultValue) == true || value == null)
-            {
-                missingFields.Add(property.Name);
-            }
+    //         if (value?.Equals(defaultValue) == true || value == null)
+    //         {
+    //             missingFields.Add(property.Name);
+    //         }
 
-        }
-        // Iterates through every property in the model and checks if it is null or default value
+    //     }
+    //     // Iterates through every property in the model and checks if it is null or default value
 
-        if (missingFields.Count > 0)
-        {
-            return BadRequest("Missing fields: " + string.Join(", ", missingFields));
-        }
-        // If any field is missing, return a bad request
-
-        await _redis.StringSetAsync("vehicleData", content); // Replace "example" with the respective database key
-        return Ok("done!");
-    }
+    //     if (missingFields.Count > 0)
+    //     {
+    //         return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+    //     }
+    //     // If any field is missing, return a bad request
+    //     using (var sr = new StreamReader(Request.Body))
+    //     {
+    //         string content = await sr.ReadToEndAsync();
+    //         await _redis.StringSetAsync("vehicleData", content);
+    //     }
+    //     await _redis.StringSetAsync("vehicleData",requestBody.Vehicle); // Replace "example" with the respective database key
+    //     return Ok("done!");
+    //}
 
 }
