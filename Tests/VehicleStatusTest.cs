@@ -5,7 +5,6 @@ using RestSharp;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using System.Diagnostics;
-//using Database.Models;
 
 public class VehicleStatusTests
 {
@@ -20,7 +19,7 @@ public class VehicleStatusTests
         //Arrange
         var baseUrl = "http://localhost:5135/SetStatusInUse";
         RestClient client = new RestClient(baseUrl);
-        RestRequest restRequest = new RestRequest(baseUrl, Method.Get);
+        RestRequest restRequest = new RestRequest(baseUrl, Method.Post);
         restRequest.AddJsonBody(new {
             Key = "UAV"
         });
@@ -52,7 +51,7 @@ public class VehicleStatusTests
         //Arrange
         var baseUrl = "http://localhost:5135/SetStatusStandby";
         RestClient client = new RestClient(baseUrl);
-        RestRequest restRequest = new RestRequest(baseUrl, Method.Get);
+        RestRequest restRequest = new RestRequest(baseUrl, Method.Post);
         restRequest.AddJsonBody(new {
             Key = "UAV"
         });
@@ -69,7 +68,7 @@ public class VehicleStatusTests
         //Arrange
         var baseUrl = "http://localhost:5135/EmergencyStop";
         RestClient client = new RestClient(baseUrl);
-        RestRequest restRequest = new RestRequest(baseUrl, Method.Get);
+        RestRequest restRequest = new RestRequest(baseUrl, Method.Post);
         restRequest.AddJsonBody(new {
             Key = "UAV"
         });
@@ -78,16 +77,5 @@ public class VehicleStatusTests
         //Assert
         Assert.That(queryResult.StatusCode, Is.EqualTo(HttpStatusCode.OK), "Status code is not OK");
         Assert.That(queryResult.Content, Is.Not.Null, "Response content is null");
-    }
-
-    [Test]
-    public void SearchBooks()
-    {
-        var baseUrl = "https://fakerestapi.azurewebsites.net/api/v1/Books";
-        RestClient client = new RestClient(baseUrl);
-        RestRequest restRequest = new RestRequest(baseUrl, Method.Get);
-        RestResponse restResponse = client.Execute(restRequest);
-        restResponse.Should().NotBeNull();
-        restResponse.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }
