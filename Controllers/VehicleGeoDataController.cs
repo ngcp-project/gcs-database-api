@@ -4,7 +4,7 @@ namespace Database.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class VehicleGeolocationController : ControllerBase
+    public class VehicleGeoDataController : ControllerBase
     {
         
     }

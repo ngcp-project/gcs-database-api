@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 
 namespace Database.Models{
-    public class MissionStages
+    public class MissionStage
     {
         // public MissionStages(string key, string stageName, Stage_Enum stageStatus){
         //     this.Key = key;
@@ -16,6 +16,6 @@ namespace Database.Models{
         public string stageName {get; set;}
         public Stage_Enum stageStatus {get; set;}
 
-        // public VehicleGeoData[] vehicleKeys {get; set;}
+        public VehicleGeoData[] vehicleKeys {get; set;}
     }
 }

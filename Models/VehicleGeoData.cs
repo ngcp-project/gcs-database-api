@@ -6,7 +6,7 @@ using Database.Models;
 
 namespace Database.Models
 {
-    public class VehicleGelocation
+    public class VehicleGeoData
     {
         public bool IsManual { get; set; } = true;
 

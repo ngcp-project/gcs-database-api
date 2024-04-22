@@ -13,22 +13,22 @@ namespace Database.Controllers;
 public class MissionInfoController : ControllerBase
 {
     private ConnectionMultiplexer conn;
-    private readonly IDatabase _redis;
+    private readonly IDatabase gcs;
 
 
 
 public MissionInfoController(){
         conn = DBConn.Instance().getConn();
 
-        _redis = conn.GetDatabase();
+        gcs = conn.GetDatabase();
         
     }
 
     
-    [HttpGet("{missionName}")]
-    public string GetMissionInfo(string missionName){
-        return _redis.StringGet(missionName);
-
+    [HttpGet("GetMissionInfo")]
+    public IActionResult getExample()
+    {
+        return gcs.StringGet("{missionName}");
     }
 
 

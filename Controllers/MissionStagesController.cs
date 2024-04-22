@@ -15,26 +15,9 @@ public class MissionStagesController : ControllerBase
     }
 
 
-    [HttpGet("GetMissionStages")]
-    public async Task<string> GetMissionStages(string stageID){
-
-        // string missionData;
-        // using (var sr = new StreamReader(Request.Body)){
-        //     missionData = await sr.ReadToEndAsync();
-        // }
-
-        string key = $"missionStage-{stageID}";
-        var missionStageDataStr = await gcs.StringGetAsync(key);
-        var jsonData = JsonSerializer.Deserialize<MissionStages>(missionStageDataStr);
-
-         var response = new
-                {
-                    jsonData.key,
-                    jsonData.stageName,
-                    jsonData.stageStatus,
-                    // jsonData.VehicleKeys
-                };
-    return JsonSerializer.Serialize(response);
+    [HttpGet("GetMissionStage")]
+    public IActionResult getMissionStage()
+    {
+        return gcs.StringGet("missionStage-{stageId}");
     }
-
 }
