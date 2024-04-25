@@ -16,10 +16,40 @@ public class VehicleDataController : ControllerBase
         _redis = conn.GetDatabase();
     }
     [HttpGet("vehicleData")]
-    public String getVehicleData()
+    public IActionResult getVehicleData([FromBody] VehicleKey requestBody)
     {
+        List<string> missingFields = new List<string>();
+
+        Type type = typeof(VehicleKey); 
+        PropertyInfo[] properties = type.GetProperties();
+        
+        foreach (System.Reflection.PropertyInfo property in properties)
+        {
+            var value = property.GetValue(requestBody, null);
+            object defaultValue = null;
+            if (property.PropertyType == typeof(string))
+            {
+                defaultValue = null;
+            }
+            else if (property.PropertyType.IsValueType)
+            {
+                defaultValue = Activator.CreateInstance(property.PropertyType);
+            }
+
+            if (value?.Equals(defaultValue) == true || value == null)
+            {
+                missingFields.Add(property.Name);
+            }
+
+            if (missingFields.Count > 0)
+            {
+            return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+            }
+        }
         // return vehicle data
-        return _redis.StringGet("vehicleData");
+        Console.WriteLine(requestBody.Key+"-geo");
+        return Ok(_redis.StringGet(requestBody.Key+"-geo").ToString());
+
     }
 
     [HttpPost("vehicleData")]
@@ -54,13 +84,7 @@ public class VehicleDataController : ControllerBase
             }
 
         }
-        // If any field is missing, return a bad request
-        using (var sr = new StreamReader(Request.Body))
-        {
-            string content = await sr.ReadToEndAsync();
-            await _redis.StringSetAsync("vehicleData", content);
-        }
-        await _redis.StringSetAsync("vehicleData",requestBody.ToString()); // Replace "example" with the respective database key
+        await _redis.StringSetAsync(requestBody.vehicleName+"-geo",requestBody.ToString()); 
         return Ok("Posted VehicleData successfully!");
     }
 
