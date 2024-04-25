@@ -8,11 +8,10 @@ namespace Database.Models
 {
     public class VehicleGeoData
     {
-        public bool IsManual { get; set; } = true;
 
-        public Coordinate Target { get; set; }
+        public Coordinate target { get; set; }
+        public Shape searchArea { get; set; }
+        public string localIP { get; set; }
 
-        //need shape class
-        public int SearchArea { get; set; }
     }
 }

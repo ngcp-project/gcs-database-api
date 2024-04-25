@@ -8,6 +8,6 @@ using System.Runtime.CompilerServices;
 namespace Database.Models{
     public class MissionInfo
     {
-        public int currentStageID { get; set; }
+        public int currentStageId { get; set; }
     }
 }

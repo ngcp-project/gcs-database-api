@@ -1,43 +1,33 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
-using System.Text;
 using StackExchange.Redis;
-using Database.Handlers;
 using System.Text.Json;
+using Database.Models;
+using System.Reflection;
 
-namespace Database.Controllers;
-
-
-[ApiController]
-[Route("api/[controller]")]
-public class MissionInfoController : ControllerBase
+public class MissionStageController : ControllerBase
 {
-    private ConnectionMultiplexer conn;
+    private ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
     private readonly IDatabase gcs;
 
-
-
-public MissionInfoController(){
-        conn = DBConn.Instance().getConn();
-
-        gcs = conn.GetDatabase();
-        
-    }
-
-    
-    [HttpGet("GetMissionInfo")]
-    public IActionResult getExample()
+    public MissionStageController()
     {
-        return gcs.StringGet("missionName");
+        gcs = redis.GetDatabase();
     }
 
 
-    [HttpPost("MissionInfo")]
-    public async Task<IActionResult> MissionInfo([FromBody] MissionInfo requestBody)
+    [HttpGet("GetMissionStage")]
+    public IActionResult GetMissionStage()
+    {
+        return gcs.StringGet("missionStage-{stageId}");
+    }
+
+
+    [HttpPost("MissionStage")]
+    public async Task<IActionResult> SetMissionStage([FromBody] MissionStage requestBody)
     {
         List<string> missingFields = new List<string>();
 
-        Type type = typeof(MissionInfo);
+        Type type = typeof(MissionStage);
         PropertyInfo[] properties = type.GetProperties();
 
         foreach (System.Reflection.PropertyInfo property in properties)
@@ -48,7 +38,7 @@ public MissionInfoController(){
             {
                 defaultValue = null;
             }
-            
+
             else if (property.PropertyType.IsValueType)
             {
                 defaultValue = Activator.CreateInstance(property.PropertyType);
@@ -65,11 +55,12 @@ public MissionInfoController(){
             
         }
 
+        // Enum Validation
+        if(!Enum.IsDefined(typeof(Stage_Enum), requestBody.StageStatus)){
+            return BadRequest("Invalid Stage_Enum");
+        }
 
-        await _redis.StringAppendAsync("missionName", requestBody.ToString());
-        return Ok("Posted MissionInfo");
+        await _redis.StringAppendAsync("missionStage-{stageId}", requestBody.ToString());
+        return Ok("Posted MissionStage");
     } 
-    
-
-
 }
