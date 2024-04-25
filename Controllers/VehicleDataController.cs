@@ -54,8 +54,6 @@ public class VehicleDataController : ControllerBase
             }
 
         }
-        // Iterates through every property in the model and checks if it is null or default value
-
         // If any field is missing, return a bad request
         using (var sr = new StreamReader(Request.Body))
         {
@@ -63,7 +61,7 @@ public class VehicleDataController : ControllerBase
             await _redis.StringSetAsync("vehicleData", content);
         }
         await _redis.StringSetAsync("vehicleData",requestBody.ToString()); // Replace "example" with the respective database key
-        return Ok("Posted VehicleData successfully! ");
+        return Ok("Posted VehicleData successfully!");
     }
 
 }
