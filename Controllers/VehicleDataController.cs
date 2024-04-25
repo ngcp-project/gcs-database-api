@@ -63,7 +63,7 @@ public class VehicleDataController : ControllerBase
             await _redis.StringSetAsync("vehicleData", content);
         }
         await _redis.StringSetAsync("vehicleData",requestBody.ToString()); // Replace "example" with the respective database key
-        return Ok("Posted VehicleData successfully!");
+        return Ok("Posted VehicleData successfully! ");
     }
 
 }
