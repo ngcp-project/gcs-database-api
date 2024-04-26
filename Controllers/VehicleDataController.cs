@@ -20,9 +20,10 @@ public class VehicleDataController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
-        Type type = typeof(VehicleKey); 
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
+        Type type = typeof(VehicleKey);
         PropertyInfo[] properties = type.GetProperties();
-        
+
         foreach (System.Reflection.PropertyInfo property in properties)
         {
             var value = property.GetValue(requestBody, null);
@@ -43,12 +44,14 @@ public class VehicleDataController : ControllerBase
 
             if (missingFields.Count > 0)
             {
-            return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+                endpointReturn.error = "Missing fields: " + string.Join(", ", missingFields);
+                return BadRequest(endpointReturn.ToString());
             }
         }
         // return vehicle data
-        Console.WriteLine(requestBody.Key+"-geo");
-        return Ok(_redis.StringGet(requestBody.Key+"-geo").ToString());
+        Console.WriteLine(requestBody.Key + "-geo");
+        endpointReturn.data = _redis.StringGet(requestBody.Key + "-geo").ToString();
+        return Ok(endpointReturn.ToString());
 
     }
 
@@ -57,9 +60,10 @@ public class VehicleDataController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
-        Type type = typeof(VehicleData); 
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
+        Type type = typeof(VehicleData);
         PropertyInfo[] properties = type.GetProperties();
-        
+
         foreach (System.Reflection.PropertyInfo property in properties)
         {
             var value = property.GetValue(requestBody, null);
@@ -80,12 +84,14 @@ public class VehicleDataController : ControllerBase
 
             if (missingFields.Count > 0)
             {
-            return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+                endpointReturn.error = "Missing fields: " + string.Join(", ", missingFields);
+                return BadRequest(endpointReturn.ToString());
             }
 
         }
-        await _redis.StringSetAsync(requestBody.vehicleName+"-geo",requestBody.ToString()); 
-        return Ok("Posted VehicleData successfully!");
+        await _redis.StringSetAsync(requestBody.vehicleName + "-geo", requestBody.ToString());
+        endpointReturn.data = "Posted VehicleData Successfully!";
+        return Ok(endpointReturn.ToString());
     }
 
 }

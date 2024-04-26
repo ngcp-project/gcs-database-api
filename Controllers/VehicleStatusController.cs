@@ -59,7 +59,7 @@ public class VehicleStatusController : ControllerBase
         // If any field is missing, return a bad request
 
         await gcs.StringSetAsync($"{requestBody.Key}-status", "1"); // Replace "example" with the respective database key
-        endpointReturn.message = "In Use";
+        endpointReturn.data = "In Use";
         return Ok(endpointReturn.ToString());
     }
 
@@ -100,7 +100,7 @@ public class VehicleStatusController : ControllerBase
         // If any field is missing, return a bad request
 
         await gcs.StringSetAsync($"{requestBody.Key}-status", "2"); // Replace "example" with the respective database key
-        endpointReturn.message = "Standby";
+        endpointReturn.data = "Standby";
         return Ok(endpointReturn.ToString());
     }
 
@@ -141,7 +141,7 @@ public class VehicleStatusController : ControllerBase
         // If any field is missing, return a bad request
 
         await gcs.StringSetAsync($"{requestBody.Key}-status", "3"); // Replace "example" with the respective database key
-        endpointReturn.message = "Emergency Stopped";
+        endpointReturn.data = "Emergency Stopped";
         return Ok(endpointReturn.ToString());
     }
 
