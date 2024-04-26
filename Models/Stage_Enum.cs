@@ -4,6 +4,7 @@ namespace Database.Models
         NOT_STARTED,
         INITIALIZED,
         IN_PROGRESS,
-        COMPLETE
+        COMPLETE,
+        UNKNOWN
     }
 }
