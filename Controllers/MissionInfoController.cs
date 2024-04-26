@@ -22,6 +22,7 @@ public class MissionInfoController : ControllerBase
 
         List<string> missingFields = new List<string>();
 
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
         Type type = typeof(MissionInfoGET);
         PropertyInfo[] properties = type.GetProperties();
 
@@ -45,12 +46,14 @@ public class MissionInfoController : ControllerBase
             }
             if (missingFields.Count > 0)
             {
-                return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+                endpointReturn.error = "Missing fields: " + string.Join(", ", missingFields);
+                return BadRequest(endpointReturn.ToString());
             }
 
         }
         string result = gcs.StringGet(requestBody.missionName).ToString();
-        return Ok(result);
+        endpointReturn.data = result;
+        return Ok(endpointReturn.ToString());
     }
 
 
@@ -59,6 +62,7 @@ public class MissionInfoController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
         Type type = typeof(MissionInfo);
         PropertyInfo[] properties = type.GetProperties();
 
@@ -82,19 +86,22 @@ public class MissionInfoController : ControllerBase
             }
             if (missingFields.Count > 0)
             {
-                return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+                endpointReturn.error = "Missing fields: " + string.Join(", ", missingFields);
+                return BadRequest(endpointReturn.ToString());
             }
         }
 
         if (gcs.StringGet("missionStage-" + requestBody.currentStageId).IsNullOrEmpty)
         {
-            return BadRequest("Invalid Stage ID: Please initialize one or reference an existing one.");
+            endpointReturn.error = "Invalid Stage ID: Please initialize one or reference an existing one.";
+            return BadRequest(endpointReturn.ToString());
         }
 
 
 
         // await gcs.StringAppendAsync(requestBody.missionName, requestBody.ToString());
         await gcs.StringSetAsync(requestBody.missionName, requestBody.ToString());
-        return Ok("Posted MissionInfo");
+        endpointReturn.data = "Posted MissionInfo";
+        return Ok(endpointReturn.ToString());
     }
 }
