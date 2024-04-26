@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
-using System.Text.Json;
 using Database.Models;
 using System.Reflection;
 
 public class MissionStageController : ControllerBase
 {
-    private ConnectionMultiplexer conn = ConnectionMultiplexer.Connect("localhost");
+    private ConnectionMultiplexer conn;
     private readonly IDatabase gcs;
 
     public MissionStageController()
@@ -82,15 +81,16 @@ public class MissionStageController : ControllerBase
             {
                 return BadRequest("Missing fields: " + string.Join(", ", missingFields));
             }
-            
+
         }
 
         // Enum Validation
-        if(!Enum.IsDefined(typeof(Stage_Enum), requestBody.stageStatus)){
+        if (!Enum.IsDefined(typeof(Stage_Enum), requestBody.stageStatus))
+        {
             return BadRequest("Invalid Stage_Enum");
         }
 
         await gcs.StringAppendAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
         return Ok("Posted MissionStage");
-    } 
+    }
 }

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
-using System.Text.Json;
 using Database.Models;
 using System.Reflection;
 
@@ -11,14 +10,12 @@ public class MissionInfoController : ControllerBase
     private ConnectionMultiplexer conn;
     private readonly IDatabase gcs;
 
-
-
-public MissionInfoController(){
+    public MissionInfoController()
+    {
         conn = DBConn.Instance().getConn();
         gcs = conn.GetDatabase();
     }
 
-    
     [HttpGet("MissionInfo")]
     public IActionResult GetMissionInfo([FromBody] MissionInfo requestBody)
     {
@@ -50,7 +47,7 @@ public MissionInfoController(){
             {
                 return BadRequest("Missing fields: " + string.Join(", ", missingFields));
             }
-            
+
         }
         string result = gcs.StringGet(requestBody.missionName);
         return Ok(result);
@@ -73,7 +70,7 @@ public MissionInfoController(){
             {
                 defaultValue = null;
             }
-            
+
             else if (property.PropertyType.IsValueType)
             {
                 defaultValue = Activator.CreateInstance(property.PropertyType);
@@ -87,14 +84,11 @@ public MissionInfoController(){
             {
                 return BadRequest("Missing fields: " + string.Join(", ", missingFields));
             }
-            
+
         }
 
 
         await gcs.StringAppendAsync(requestBody.missionName, requestBody.ToString());
         return Ok("Posted MissionInfo");
-    } 
-    
-
-
+    }
 }

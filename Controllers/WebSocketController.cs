@@ -2,9 +2,7 @@ using System.Net.WebSockets;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using StackExchange.Redis;
-using RabbitMQ.Client.Events;
 using Database.Handlers;
-using System.IO;
 using System.Text.Json;
 using Database.Models;
 
