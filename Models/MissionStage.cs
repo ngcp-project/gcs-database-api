@@ -7,6 +7,7 @@ namespace Database.Models{
     {
 
         public string key {get; set;}
+        public string stageId {get; set;}
         public string stageName {get; set;}
         public Stage_Enum stageStatus {get; set;}
         public VehicleGeoData[] vehicleKeys {get; set;}

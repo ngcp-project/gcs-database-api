@@ -15,18 +15,45 @@ public class MissionInfoController : ControllerBase
 
 public MissionInfoController(){
         conn = DBConn.Instance().getConn();
-
         gcs = conn.GetDatabase();
-        
     }
 
     
     [HttpGet("GetMissionInfo")]
-    public IActionResult getExample()
+    public IActionResult GetMissionInfo([FromBody] MissionInfo requestBody)
     {
-        string result = gcs.StringGet("missionName");
-        return Ok(result);
 
+        List<string> missingFields = new List<string>();
+
+        Type type = typeof(MissionStage);
+        PropertyInfo[] properties = type.GetProperties();
+
+        foreach (System.Reflection.PropertyInfo property in properties)
+        {
+            var value = property.GetValue(requestBody, null);
+            object defaultValue = null;
+            if (property.PropertyType == typeof(string))
+            {
+                defaultValue = null;
+            }
+
+            else if (property.PropertyType.IsValueType)
+            {
+                defaultValue = Activator.CreateInstance(property.PropertyType);
+            }
+
+            if (value?.Equals(defaultValue) == true || value == null)
+            {
+                missingFields.Add(property.Name);
+            }
+            if (missingFields.Count > 0)
+            {
+                return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+            }
+            
+        }
+        string result = gcs.StringGet(requestBody.missionName);
+        return Ok(result);
     }
 
 
@@ -64,7 +91,7 @@ public MissionInfoController(){
         }
 
 
-        await gcs.StringAppendAsync("missionName", requestBody.ToString());
+        await gcs.StringAppendAsync(requestBody.missionName, requestBody.ToString());
         return Ok("Posted MissionInfo");
     } 
     
