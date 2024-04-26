@@ -1,15 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 
-namespace Database.Models{
+namespace Database.Models
+{
     public class MissionInfo
     {
 
-        public string missionName { get; set; } 
-        public int currentStageId { get; set; }
+        public string missionName { get; set; }
+        public string currentStageId { get; set; }
+        
+        public override string ToString()
+        {
+            return JsonSerializer.Serialize(this);
+        }
     }
 }

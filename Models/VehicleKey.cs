@@ -1,13 +1,7 @@
-using System.Runtime.CompilerServices;
-
 namespace Database.Models
 {
     public class VehicleKey
     {
-
-        public string Key {get; set;}
-        // public Vehicle() {
-
-        // }
+        public string Key { get; set; }
     }
 }

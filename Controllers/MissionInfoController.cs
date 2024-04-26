@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
-using System.Text.Json;
 using Database.Models;
 using System.Reflection;
 
@@ -11,21 +10,19 @@ public class MissionInfoController : ControllerBase
     private ConnectionMultiplexer conn;
     private readonly IDatabase gcs;
 
-
-
-public MissionInfoController(){
+    public MissionInfoController()
+    {
         conn = DBConn.Instance().getConn();
         gcs = conn.GetDatabase();
     }
 
-    
     [HttpGet("MissionInfo")]
-    public IActionResult GetMissionInfo([FromBody] MissionInfo requestBody)
+    public IActionResult GetMissionInfo([FromBody] MissionInfoGET requestBody)
     {
 
         List<string> missingFields = new List<string>();
 
-        Type type = typeof(MissionStage);
+        Type type = typeof(MissionInfoGET);
         PropertyInfo[] properties = type.GetProperties();
 
         foreach (System.Reflection.PropertyInfo property in properties)
@@ -50,9 +47,9 @@ public MissionInfoController(){
             {
                 return BadRequest("Missing fields: " + string.Join(", ", missingFields));
             }
-            
+
         }
-        string result = gcs.StringGet(requestBody.missionName);
+        string result = gcs.StringGet(requestBody.missionName).ToString();
         return Ok(result);
     }
 
@@ -73,7 +70,7 @@ public MissionInfoController(){
             {
                 defaultValue = null;
             }
-            
+
             else if (property.PropertyType.IsValueType)
             {
                 defaultValue = Activator.CreateInstance(property.PropertyType);
@@ -87,14 +84,17 @@ public MissionInfoController(){
             {
                 return BadRequest("Missing fields: " + string.Join(", ", missingFields));
             }
-            
+        }
+
+        if (gcs.StringGet("missionStage-" + requestBody.currentStageId).IsNullOrEmpty)
+        {
+            return BadRequest("Invalid Stage ID: Please initialize one or reference an existing one.");
         }
 
 
-        await gcs.StringAppendAsync(requestBody.missionName, requestBody.ToString());
+
+        // await gcs.StringAppendAsync(requestBody.missionName, requestBody.ToString());
+        await gcs.StringSetAsync(requestBody.missionName, requestBody.ToString());
         return Ok("Posted MissionInfo");
-    } 
-    
-
-
+    }
 }
