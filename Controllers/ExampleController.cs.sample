@@ -1,0 +1,66 @@
+using System.Reflection;
+using Database.Models;
+using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis;
+
+namespace Database.Controllers;
+
+
+// Template
+// Name file endpoint name + Controller
+public class ExampleController : ControllerBase
+{
+    private ConnectionMultiplexer conn;
+    private readonly IDatabase _redis;
+
+    public ExampleController()
+    {
+        conn = DBConn.Instance().getConn();
+        _redis = conn.GetDatabase();
+    }
+
+    [HttpGet("example")]
+    public IActionResult getExample()
+    {
+        string result = _redis.StringGet("example"); // Replace "example" with the respective database key
+        return Ok(result);
+    }
+
+    [HttpPost("example")]
+    public async Task<IActionResult> PostExample([FromBody] ExampleModel requestBody)
+    {
+        List<string> missingFields = new List<string>();
+
+        Type type = typeof(ExampleModel); // Replace ExampleModel with the respective model
+        PropertyInfo[] properties = type.GetProperties();
+        foreach (System.Reflection.PropertyInfo property in requestBody.GetType().GetProperties())
+        {
+            var value = property.GetValue(requestBody, null);
+            object defaultValue = null;
+            if (property.PropertyType == typeof(string))
+            {
+                defaultValue = null;
+            }
+            else if (property.PropertyType.IsValueType)
+            {
+                defaultValue = Activator.CreateInstance(property.PropertyType);
+            }
+
+            if (value?.Equals(defaultValue) == true || value == null)
+            {
+                missingFields.Add(property.Name);
+            }
+
+        }
+        // Iterates through every property in the model and checks if it is null or default value
+
+        if (missingFields.Count > 0)
+        {
+            return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+        }
+        // If any field is missing, return a bad request
+
+        await _redis.StringSetAsync("example", requestBody.ExampleString); // Replace "example" with the respective database key
+        return Ok("hi");
+    }
+}

@@ -1,88 +1,145 @@
-using System;
-using System.Net;
 using System.Net.WebSockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using System.Text;
+using StackExchange.Redis;
+using RabbitMQ.Client.Events;
+using Database.Handlers;
+using System.IO;
 using System.Text.Json;
 using Database.Models;
 
-using StackExchange.Redis;
-using Microsoft.Extensions.Primitives;
-
 namespace Database.Controllers
 {
-
-    [ApiController]
-    [Route("[controller]")]
+    /**
+    * <summary>
+    *   Receives vehicle data from vehicles via RabbitMQ, saves vehicle data to database, and sends
+    *   data to front end via a WebSocket connection.
+    *   <para />
+    *   Note: A WebSocket connection must be established before establishing a RabbitMQ connection. 
+    * </summary>
+    */
     public class WebSocketController : ControllerBase
     {
-        private new const int BadRequest = ((int)HttpStatusCode.BadRequest);
         private readonly ILogger<WebSocketController> _logger;
+        private readonly IDatabase _redis;
+        private readonly RabbitMqConsumer _rabbitmq;
 
-        private ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
-        private IDatabase db;
-
-        public WebSocketController(ILogger<WebSocketController> logger)
+        public WebSocketController(
+            ILogger<WebSocketController> logger,
+            IConnectionMultiplexer redis,
+            RabbitMqConsumer rabbitmq)
         {
             _logger = logger;
-            db = redis.GetDatabase();
+            _redis = redis.GetDatabase();
+            _rabbitmq = rabbitmq;
         }
 
-        [Route("/ws")]
-        public async Task Get()
+        /**
+        * <summary>
+        *   Establish a WebSocket connection to retrieve vehicle telemetry from backend
+        *   <para />
+        *   Note: A RabbitMQ connection will be established upon a WebSocket connection 
+        * </summary>
+        * <param name="vehicleName">Name of vehicle to retrieve telemetry data</param>
+        */
+        [HttpGet("/ws/{vehicleName}")]
+        public async Task GetTelemetry(string vehicleName)
         {
-
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
-                using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                _logger.Log(LogLevel.Information, "WebSocket connection established");
-                await Echo(webSocket);
+                // Accept the WebSocket connection & establish queue name
+                using WebSocket ws = await HttpContext.WebSockets.AcceptWebSocketAsync();
+                string queueName = $"telemetry_{vehicleName.ToLower()}";
+
+                _logger.Log(LogLevel.Information, $"\nWebsocket connection established with {vehicleName.ToUpper()}!\n");
+                _logger.Log(LogLevel.Information, "\nQueue: " + queueName);
+                _rabbitmq.CreateConsumer(queueName);
+
+                // Use a CancellationTokenSource to control the loop
+                CancellationTokenSource tokenSource = new();
+
+                // Start the RabbitMQ consumer in a separate task
+                Task task = Task.Run(() => ListenToRabbitMq(ws, queueName, tokenSource.Token));
+
+                byte[] buffer = new byte[1024 * 4];
+                WebSocketReceiveResult result;
+
+                // Stop listening to the specific client when specified
+                do
+                {
+                    result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                    Console.Write("-");
+                    Thread.Sleep(100);
+
+                } while (!result.CloseStatus.HasValue);
+
+                tokenSource.Cancel();
+
+                _logger.Log(LogLevel.Error, "Websocket connection aborted!");
+                _rabbitmq.StopConsuming();
+
             }
-            else
-            {
-                HttpContext.Response.StatusCode = BadRequest;
-            }
+            else HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
         }
 
-        private async Task Echo(WebSocket webSocket)
-        {
-            var buffer = new byte[1024 * 4];
-            var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            _logger.Log(LogLevel.Information, "Message received from Client");
-
-            while (!result.CloseStatus.HasValue)
+/**
+        * <summary>
+        *   Establish a WebSocket connection to retrieve vehicle telemetry from backend
+        * </summary>
+        * <param name="ws">Open WebSocket connection</param>
+        * <param name="queueName">RabbitMQ consumer queueName. Format: telemetry_vehiclename (all lowercase)</param>
+        * <param name="cancellationToken">Token used to cancel or dispose of RabbitMQ consumer</param>
+        */
+        private async Task ListenToRabbitMq(WebSocket ws, string queueName, CancellationToken cancellationToken)
+        {   
+            // Add a callback function to RabbitMQ
+            // NOTE: This will be triggered whenever a RabbitMQ message is received
+            _rabbitmq.Consumer.Received += async (channel, eventArgs) =>
             {
-                //string value = await db.StringGetAsync("foo");
-                //Console.WriteLine(value);
-                //string inputString = Encoding.UTF8.GetString(buffer);
+                var body = eventArgs.Body.ToArray();
+                var inputString = Encoding.UTF8.GetString(body).TrimEnd('\0');
+                // Deserialize JSON String
+                Vehicle vehicleData = new Vehicle();
 
-                // Store JSON as string
-                //string inputString = Encoding.UTF8.GetString(buffer.TakeWhile(x => x != 0).ToArray()); // This also works, not sure which is more efficient
-                string inputString = Encoding.UTF8.GetString(buffer).TrimEnd('\0');
+                _logger.Log(LogLevel.Information, inputString);
 
-                // Deserialize JSON string
-                Vehicle vehicleData = JsonSerializer.Deserialize<Vehicle>(inputString);
+                try {
+                    vehicleData = JsonSerializer.Deserialize<Vehicle>(inputString);
+                }
+                catch (Exception e) {
+                    _logger.Log(LogLevel.Error, "Error: " + e.Message);
+                    return;
+                }
 
                 // Get Vehicle key
                 var vehicleKey = vehicleData.key;
 
-                // Send message back to clients
-                await webSocket.SendAsync(new ArraySegment<byte>(buffer, 0, buffer.Length), result.MessageType, result.EndOfMessage, CancellationToken.None);
+                // Save vehicle data to database
+                _logger.Log(LogLevel.Information, "Saving vehicle data to database!");
+                _redis.StringSet(vehicleKey, inputString);
 
-                db.StringSet(vehicleKey, inputString);
+                _logger.Log(LogLevel.Information, "Sending WebSocket message...");
 
-                // db.StringSet("test", Encoding.UTF8.GetString(buffer));
+                await ws.SendAsync(
+                    new ArraySegment<byte>(eventArgs.Body.ToArray()),
+                    WebSocketMessageType.Text,
+                    true,
+                    CancellationToken.None
+                );
+            };
 
-                buffer = new byte[1024 * 4];
-                result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                _logger.Log(LogLevel.Information, "Message received from Client");
+            _rabbitmq.StartConsuming(queueName);
+
+            try
+            {
+                // Wait for cancellation or dispose the consumer
+                await Task.Delay(Timeout.Infinite, cancellationToken);
             }
-
-            await webSocket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-            _logger.Log(LogLevel.Information, "WebSocket connection closed");
+            finally
+            {
+                _rabbitmq.StopConsuming();
+            }
         }
+
     }
 }
