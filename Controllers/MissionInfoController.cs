@@ -19,7 +19,7 @@ public MissionInfoController(){
     }
 
     
-    [HttpGet("GetMissionInfo")]
+    [HttpGet("MissionInfo")]
     public IActionResult GetMissionInfo([FromBody] MissionInfo requestBody)
     {
 
@@ -58,7 +58,7 @@ public MissionInfoController(){
 
 
     [HttpPost("MissionInfo")]
-    public async Task<IActionResult> MissionInfo([FromBody] MissionInfo requestBody)
+    public async Task<IActionResult> SetMissionInfo([FromBody] MissionInfo requestBody)
     {
         List<string> missingFields = new List<string>();
 

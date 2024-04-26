@@ -16,7 +16,7 @@ public class MissionStageController : ControllerBase
     }
 
 
-    [HttpGet("GetMissionStage")]
+    [HttpGet("MissionStage")]
     public IActionResult GetMissionStage([FromBody] MissionStage requestBody)
     {
         List<string> missingFields = new List<string>();
