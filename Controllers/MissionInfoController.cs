@@ -1,15 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
-using System.Text;
 using StackExchange.Redis;
-using Database.Handlers;
 using System.Text.Json;
+using Database.Models;
+using System.Reflection;
+
 
 namespace Database.Controllers;
-
-
-[ApiController]
-[Route("api/[controller]")]
 public class MissionInfoController : ControllerBase
 {
     private ConnectionMultiplexer conn;
@@ -28,7 +24,9 @@ public MissionInfoController(){
     [HttpGet("GetMissionInfo")]
     public IActionResult getExample()
     {
-        return gcs.StringGet("missionName");
+        string result = gcs.StringGet("missionName");
+        return Ok(result);
+
     }
 
 
@@ -66,7 +64,7 @@ public MissionInfoController(){
         }
 
 
-        await _redis.StringAppendAsync("missionName", requestBody.ToString());
+        await gcs.StringAppendAsync("missionName", requestBody.ToString());
         return Ok("Posted MissionInfo");
     } 
     

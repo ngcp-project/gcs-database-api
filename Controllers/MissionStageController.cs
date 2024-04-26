@@ -6,19 +6,21 @@ using System.Reflection;
 
 public class MissionStageController : ControllerBase
 {
-    private ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
+    private ConnectionMultiplexer conn = ConnectionMultiplexer.Connect("localhost");
     private readonly IDatabase gcs;
 
     public MissionStageController()
     {
-        gcs = redis.GetDatabase();
+        conn = DBConn.Instance().getConn();
+        gcs = conn.GetDatabase();
     }
 
 
     [HttpGet("GetMissionStage")]
     public IActionResult GetMissionStage()
     {
-        return gcs.StringGet("missionStage-{stageId}");
+        string result = gcs.StringGet("missionStage-{stageId}");
+        return Ok(result);
     }
 
 
@@ -56,11 +58,11 @@ public class MissionStageController : ControllerBase
         }
 
         // Enum Validation
-        if(!Enum.IsDefined(typeof(Stage_Enum), requestBody.StageStatus)){
+        if(!Enum.IsDefined(typeof(Stage_Enum), requestBody.stageStatus)){
             return BadRequest("Invalid Stage_Enum");
         }
 
-        await _redis.StringAppendAsync("missionStage-{stageId}", requestBody.ToString());
+        await gcs.StringAppendAsync("missionStage-{stageId}", requestBody.ToString());
         return Ok("Posted MissionStage");
     } 
 }
