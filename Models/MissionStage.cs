@@ -1,7 +1,4 @@
-using System;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Database.Models
 {
@@ -11,7 +8,7 @@ namespace Database.Models
         public string stageId { get; set; }
         public string stageName { get; set; }
         public string stageStatus { get; set; }
-        public Stage_Enum MissionStageStatus { get; set; }
+        private Stage_Enum MissionStageStatus { get; set; }
         public VehicleData[] vehicleKeys { get; set; }
 
         public MissionStage(string key, string stageId, string stageName, string stageStatus)
@@ -23,15 +20,24 @@ namespace Database.Models
 
             string lowerCaseStatus = stageStatus.ToLower();
 
-            if (lowerCaseStatus == "not_started") {
+            if (lowerCaseStatus == "not_started")
+            {
                 this.MissionStageStatus = Stage_Enum.NOT_STARTED;
-            } else if (lowerCaseStatus == "initialized") {
+            }
+            else if (lowerCaseStatus == "initialized")
+            {
                 this.MissionStageStatus = Stage_Enum.INITIALIZED;
-            } else if (lowerCaseStatus == "in_progress") {
+            }
+            else if (lowerCaseStatus == "in_progress")
+            {
                 this.MissionStageStatus = Stage_Enum.IN_PROGRESS;
-            } else if (lowerCaseStatus == "completed") {
+            }
+            else if (lowerCaseStatus == "completed")
+            {
                 this.MissionStageStatus = Stage_Enum.COMPLETE;
-            } else {
+            }
+            else
+            {
                 this.MissionStageStatus = Stage_Enum.UNKNOWN;
             }
 
@@ -40,7 +46,7 @@ namespace Database.Models
 
         public override string ToString()
         {
-            var objectToSerialize = new 
+            var objectToSerialize = new
             {
                 key = this.key,
                 stageId = this.stageId,
