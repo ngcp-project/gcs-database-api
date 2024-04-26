@@ -1,27 +1,30 @@
-using System.Reflection;
-using Database.Models;
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
+using Database.Models;
+using System.Reflection;
+
 
 namespace Database.Controllers;
-public class VehicleDataController : ControllerBase
+public class MissionInfoController : ControllerBase
 {
     private ConnectionMultiplexer conn;
-    private readonly IDatabase _redis;
+    private readonly IDatabase gcs;
 
-    public VehicleDataController()
+    public MissionInfoController()
     {
         conn = DBConn.Instance().getConn();
-        _redis = conn.GetDatabase();
+        gcs = conn.GetDatabase();
     }
-    [HttpGet("vehicleData")]
-    public IActionResult getVehicleData([FromBody] VehicleKey requestBody)
+
+    [HttpGet("MissionInfo")]
+    public IActionResult GetMissionInfo([FromBody] MissionInfoGET requestBody)
     {
+
         List<string> missingFields = new List<string>();
 
-        Type type = typeof(VehicleKey); 
+        Type type = typeof(MissionInfoGET);
         PropertyInfo[] properties = type.GetProperties();
-        
+
         foreach (System.Reflection.PropertyInfo property in properties)
         {
             var value = property.GetValue(requestBody, null);
@@ -30,6 +33,7 @@ public class VehicleDataController : ControllerBase
             {
                 defaultValue = null;
             }
+
             else if (property.PropertyType.IsValueType)
             {
                 defaultValue = Activator.CreateInstance(property.PropertyType);
@@ -39,26 +43,25 @@ public class VehicleDataController : ControllerBase
             {
                 missingFields.Add(property.Name);
             }
-
             if (missingFields.Count > 0)
             {
-            return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+                return BadRequest("Missing fields: " + string.Join(", ", missingFields));
             }
-        }
-        // return vehicle data
-        Console.WriteLine(requestBody.Key+"-geo");
-        return Ok(_redis.StringGet(requestBody.Key+"-geo").ToString());
 
+        }
+        string result = gcs.StringGet(requestBody.missionName).ToString();
+        return Ok(result);
     }
 
-    [HttpPost("vehicleData")]
-    public async Task<IActionResult> postVehicleData([FromBody] VehicleData requestBody)
+
+    [HttpPost("MissionInfo")]
+    public async Task<IActionResult> SetMissionInfo([FromBody] MissionInfo requestBody)
     {
         List<string> missingFields = new List<string>();
 
-        Type type = typeof(VehicleData); 
+        Type type = typeof(MissionInfo);
         PropertyInfo[] properties = type.GetProperties();
-        
+
         foreach (System.Reflection.PropertyInfo property in properties)
         {
             var value = property.GetValue(requestBody, null);
@@ -67,6 +70,7 @@ public class VehicleDataController : ControllerBase
             {
                 defaultValue = null;
             }
+
             else if (property.PropertyType.IsValueType)
             {
                 defaultValue = Activator.CreateInstance(property.PropertyType);
@@ -76,15 +80,21 @@ public class VehicleDataController : ControllerBase
             {
                 missingFields.Add(property.Name);
             }
-
             if (missingFields.Count > 0)
             {
-            return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+                return BadRequest("Missing fields: " + string.Join(", ", missingFields));
             }
-
         }
-        await _redis.StringSetAsync(requestBody.vehicleName+"-geo",requestBody.ToString()); 
-        return Ok("Posted VehicleData successfully!");
-    }
 
+        if (gcs.StringGet("missionStage-" + requestBody.currentStageId).IsNullOrEmpty)
+        {
+            return BadRequest("Invalid Stage ID: Please initialize one or reference an existing one.");
+        }
+
+
+
+        // await gcs.StringAppendAsync(requestBody.missionName, requestBody.ToString());
+        await gcs.StringSetAsync(requestBody.missionName, requestBody.ToString());
+        return Ok("Posted MissionInfo");
+    }
 }
