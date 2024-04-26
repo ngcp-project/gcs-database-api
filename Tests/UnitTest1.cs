@@ -1,8 +1,6 @@
 using System.Net;
-using System.Text.Json;
 using FluentAssertions;
 using RestSharp;
-using NUnit.Framework;
 
 public class Tests
 {

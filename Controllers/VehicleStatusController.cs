@@ -6,12 +6,13 @@ using System.Reflection;
 
 public class VehicleStatusController : ControllerBase
 {
-    private ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost");
+    private ConnectionMultiplexer conn;
     private readonly IDatabase gcs;
 
     public VehicleStatusController()
     {
-        gcs = redis.GetDatabase();
+        conn = DBConn.Instance().getConn();
+        gcs = conn.GetDatabase();
     }
 
     /*
