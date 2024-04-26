@@ -18,17 +18,27 @@ public class ZonesController : ControllerBase
     }
 
     [HttpGet("zones/in")]
-    public String getInZones()
+    public IActionResult getInZones()
     {
         // return keep-in zones
-        return _redis.StringGet("keepIn");
+        if (_redis.StringGet("keepIn").IsNullOrEmpty)
+        {
+            return BadRequest("No keep-in zones found.");
+        }
+
+        return Ok(_redis.StringGet("keepIn").ToString().Split("|"));
     }
 
     [HttpGet("zones/out")]
-    public String getOutZones()
+    public IActionResult getOutZones()
     {
         // return keep-out zones
-        return _redis.StringGet("keepOut");
+        if (_redis.StringGet("keepOut").IsNullOrEmpty)
+        {
+            return BadRequest("No keep-out zones found.");
+        }
+
+        return Ok(_redis.StringGet("keepOut").ToString().Split("|"));
     }
 
     [HttpPost("zones/in")]
@@ -69,9 +79,15 @@ public class ZonesController : ControllerBase
             return BadRequest("Invalid shape type");
         }
 
+        Console.WriteLine(requestBody.ToString());
+        if (_redis.StringGet("keepIn").IsNullOrEmpty)
+        {
+            await _redis.StringSetAsync("keepIn", requestBody.ToString());
+            return Ok("Posted keepIn zone successfully.");
+        }
+        // Initializes the array to have the first element as the first zone
 
-        // await _redis.StringSetAsync("keepIn", requestBody.ToString()); // Replace "example" with the respective database key
-        await _redis.StringAppendAsync("keepIn", requestBody.ToString());
+        await _redis.StringAppendAsync("keepIn", "|" + requestBody.ToString());
         return Ok("Posted keepIn zone successfully.");
     } // end postKeepIn
 
@@ -117,8 +133,14 @@ public class ZonesController : ControllerBase
         }
 
 
-        // await _redis.StringSetAsync("keepOut", requestBody.ToString()); // Replace "example" with the respective database key
-        await _redis.StringAppendAsync("keepOut", requestBody.ToString());
+        if (_redis.StringGet("keepOut").IsNullOrEmpty)
+        {
+            await _redis.StringSetAsync("keepOut", requestBody.ToString());
+            return Ok("Posted keepOut zone successfully.");
+        }
+        // Initializes the array to have the first element as the first zone
+
+        await _redis.StringAppendAsync("keepOut", "|" + requestBody.ToString());
         return Ok("Posted keepOut zone successfully.");
     } // end postKeepOut
 
