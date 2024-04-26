@@ -17,12 +17,12 @@ public class MissionInfoController : ControllerBase
     }
 
     [HttpGet("MissionInfo")]
-    public IActionResult GetMissionInfo([FromBody] MissionInfo requestBody)
+    public IActionResult GetMissionInfo([FromBody] MissionInfoGET requestBody)
     {
 
         List<string> missingFields = new List<string>();
 
-        Type type = typeof(MissionStage);
+        Type type = typeof(MissionInfoGET);
         PropertyInfo[] properties = type.GetProperties();
 
         foreach (System.Reflection.PropertyInfo property in properties)
@@ -49,7 +49,7 @@ public class MissionInfoController : ControllerBase
             }
 
         }
-        string result = gcs.StringGet(requestBody.missionName);
+        string result = gcs.StringGet(requestBody.missionName).ToString();
         return Ok(result);
     }
 
@@ -84,11 +84,17 @@ public class MissionInfoController : ControllerBase
             {
                 return BadRequest("Missing fields: " + string.Join(", ", missingFields));
             }
+        }
 
+        if (gcs.StringGet("missionStage-" + requestBody.currentStageId).IsNullOrEmpty)
+        {
+            return BadRequest("Invalid Stage ID: Please initialize one or reference an existing one.");
         }
 
 
-        await gcs.StringAppendAsync(requestBody.missionName, requestBody.ToString());
+
+        // await gcs.StringAppendAsync(requestBody.missionName, requestBody.ToString());
+        await gcs.StringSetAsync(requestBody.missionName, requestBody.ToString());
         return Ok("Posted MissionInfo");
     }
 }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
 using Database.Models;
 using System.Reflection;
+using System.Text.Json;
 
 public class MissionStageController : ControllerBase
 {
@@ -16,11 +17,11 @@ public class MissionStageController : ControllerBase
 
 
     [HttpGet("MissionStage")]
-    public IActionResult GetMissionStage([FromBody] MissionStage requestBody)
+    public IActionResult GetMissionStage([FromBody] MissionStageGET requestBody)
     {
         List<string> missingFields = new List<string>();
 
-        Type type = typeof(MissionStage);
+        Type type = typeof(MissionStageGET);
         PropertyInfo[] properties = type.GetProperties();
 
         foreach (System.Reflection.PropertyInfo property in properties)
@@ -90,7 +91,19 @@ public class MissionStageController : ControllerBase
             return BadRequest("Invalid Stage_Enum");
         }
 
-        await gcs.StringAppendAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
+        // if (gcs.StringGet("missionStage-" + requestBody.stageId).IsNullOrEmpty)
+        // {
+        //     await gcs.StringSetAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
+        //     return Ok("Posted MissionStage");
+        // }
+        // // Initializes mission stage entry if it does not exist
+
+        // MissionStage currentMissionStageEntry = JsonSerializer.Deserialize<MissionStage>(gcs.StringGet("missionStage-" + requestBody.stageId));
+
+
+
+        // await gcs.StringAppendAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
+        await gcs.StringSetAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
         return Ok("Posted MissionStage");
     }
 }
