@@ -65,7 +65,7 @@ public class ExampleController : ControllerBase
         // If any field is missing, return a bad request
 
         await _redis.StringSetAsync("example", requestBody.ExampleString); // Replace "example" with the respective database key
-        endpointReturn.data = "hi";
+        endpointReturn.message = "hi";
         return Ok(endpointReturn.ToString());
     }
 }

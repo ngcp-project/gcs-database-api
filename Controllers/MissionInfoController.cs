@@ -101,7 +101,7 @@ public class MissionInfoController : ControllerBase
 
         // await gcs.StringAppendAsync(requestBody.missionName, requestBody.ToString());
         await gcs.StringSetAsync(requestBody.missionName, requestBody.ToString());
-        endpointReturn.data = "Posted MissionInfo";
+        endpointReturn.message = "Posted MissionInfo";
         return Ok(endpointReturn.ToString());
     }
 }

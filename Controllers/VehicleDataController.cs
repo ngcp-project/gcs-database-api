@@ -89,7 +89,7 @@ public class VehicleDataController : ControllerBase
 
         }
         await _redis.StringSetAsync(requestBody.vehicleName + "-geo", requestBody.ToString());
-        endpointReturn.data = "Posted VehicleData Successfully!";
+        endpointReturn.message = "Posted VehicleData Successfully!";
         return Ok(endpointReturn.ToString());
     }
 
