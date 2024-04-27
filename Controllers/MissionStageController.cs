@@ -21,6 +21,7 @@ public class MissionStageController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
         Type type = typeof(MissionStageGET);
         PropertyInfo[] properties = type.GetProperties();
 
@@ -44,11 +45,13 @@ public class MissionStageController : ControllerBase
             }
             if (missingFields.Count > 0)
             {
-                return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+                endpointReturn.error = "Missing fields: " + string.Join(", ", missingFields);
+                return BadRequest(endpointReturn.ToString());
             }
         }
         string result = gcs.StringGet("missionStage-" + requestBody.stageId);
-        return Ok(result);
+        endpointReturn.data = result;
+        return Ok(endpointReturn.ToString());
     }
 
 
@@ -57,6 +60,7 @@ public class MissionStageController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
         Type type = typeof(MissionStage);
         PropertyInfo[] properties = type.GetProperties();
 
@@ -80,7 +84,8 @@ public class MissionStageController : ControllerBase
             }
             if (missingFields.Count > 0)
             {
-                return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+                endpointReturn.error = "Missing fields: " + string.Join(", ", missingFields);
+                return BadRequest(endpointReturn.ToString());
             }
 
         }
@@ -88,7 +93,8 @@ public class MissionStageController : ControllerBase
         // Enum Validation
         if (!Enum.IsDefined(typeof(Stage_Enum), requestBody.stageStatus))
         {
-            return BadRequest("Invalid Stage_Enum");
+            endpointReturn.error = "Invalid Stage_Enum";
+            return BadRequest(endpointReturn.ToString());
         }
 
         // if (gcs.StringGet("missionStage-" + requestBody.stageId).IsNullOrEmpty)
@@ -104,6 +110,7 @@ public class MissionStageController : ControllerBase
 
         // await gcs.StringAppendAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
         await gcs.StringSetAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
-        return Ok("Posted MissionStage");
+        endpointReturn.message = "Posted MissionStage";
+        return Ok(endpointReturn.ToString());
     }
 }
