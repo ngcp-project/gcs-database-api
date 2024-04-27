@@ -20,10 +20,12 @@ public class ZonesController : ControllerBase
     [HttpGet("zones/in")]
     public IActionResult getInZones()
     {
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
         // return keep-in zones
         if (_redis.StringGet("keepIn").IsNullOrEmpty)
         {
-            return BadRequest("No keep-in zones found.");
+            endpointReturn.error = "No keep-in zones found.";
+            return BadRequest(endpointReturn.ToString());
         }
 
         return Ok(_redis.StringGet("keepIn").ToString().Split("|"));
@@ -32,13 +34,16 @@ public class ZonesController : ControllerBase
     [HttpGet("zones/out")]
     public IActionResult getOutZones()
     {
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
         // return keep-out zones
         if (_redis.StringGet("keepOut").IsNullOrEmpty)
         {
-            return BadRequest("No keep-out zones found.");
+            endpointReturn.error = "No keep-out zones found.";
+            return BadRequest(endpointReturn.ToString());
         }
 
-        return Ok(_redis.StringGet("keepOut").ToString().Split("|"));
+        endpointReturn.data = _redis.StringGet("keepOut").ToString();
+        return Ok(endpointReturn.ToString());
     }
 
     [HttpPost("zones/in")]
@@ -46,6 +51,7 @@ public class ZonesController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
         Type type = typeof(Zone);
         PropertyInfo[] properties = type.GetProperties();
 
@@ -69,26 +75,30 @@ public class ZonesController : ControllerBase
 
             if (missingFields.Count > 0)
             {
-                return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+                endpointReturn.error = "Missing fields: " + string.Join(", ", missingFields);
+                return BadRequest(endpointReturn.ToString());
             }
             // If any field is missing, return a bad request
         }
         requestBody.keepIn = true;
         if (requestBody.zoneShapeType == ShapeType.Unknown)
         {
-            return BadRequest("Invalid shape type");
+            endpointReturn.error = "Invalid shape type";
+            return BadRequest(endpointReturn.ToString());
         }
 
         Console.WriteLine(requestBody.ToString());
         if (_redis.StringGet("keepIn").IsNullOrEmpty)
         {
             await _redis.StringSetAsync("keepIn", requestBody.ToString());
-            return Ok("Posted keepIn zone successfully.");
+            endpointReturn.message = "Posted keepIn zone successfully.";
+            return Ok(endpointReturn.ToString());
         }
         // Initializes the array to have the first element as the first zone
 
         await _redis.StringAppendAsync("keepIn", "|" + requestBody.ToString());
-        return Ok("Posted keepIn zone successfully.");
+        endpointReturn.message = "Posted keepIn zone successfully.";
+        return Ok(endpointReturn.ToString());
     } // end postKeepIn
 
     [HttpPost("zones/out")]
@@ -96,6 +106,7 @@ public class ZonesController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
         Type type = typeof(Zone);
         PropertyInfo[] properties = type.GetProperties();
 
@@ -120,28 +131,32 @@ public class ZonesController : ControllerBase
             // If any field is missing, return a bad request
             if (missingFields.Count > 0)
             {
-                return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+                endpointReturn.error = "Missing fields: " + string.Join(", ", missingFields);
+                return BadRequest(endpointReturn.ToString());
             }
-            
+
         }
 
         // validate shape type
         requestBody.keepIn = false;
         if (requestBody.zoneShapeType == ShapeType.Unknown)
         {
-            return BadRequest("Invalid shape type");
+            endpointReturn.error = "Invalid shape type";
+            return BadRequest(endpointReturn.ToString());
         }
 
 
         if (_redis.StringGet("keepOut").IsNullOrEmpty)
         {
             await _redis.StringSetAsync("keepOut", requestBody.ToString());
-            return Ok("Posted keepOut zone successfully.");
+            endpointReturn.message = "Posted keepOut zone successfully.";
+            return Ok(endpointReturn.ToString());
         }
         // Initializes the array to have the first element as the first zone
 
         await _redis.StringAppendAsync("keepOut", "|" + requestBody.ToString());
-        return Ok("Posted keepOut zone successfully.");
+        endpointReturn.message = "Posted keepOut zone successfully.";
+        return Ok(endpointReturn.ToString());
     } // end postKeepOut
 
     // [HttpDelete("zones/in")]
