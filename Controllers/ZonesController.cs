@@ -160,17 +160,35 @@ public class ZonesController : ControllerBase
     } // end postKeepOut
 
     [HttpDelete("zones/in")]
-     public async Task<IActionResult> clearKeepIn()
+     public IActionResult clearKeepIn()
     {
-        await _redis.KeyDeleteAsync("keepIn");
-        return Ok("keep-in zones cleared successfully.");
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
+        // check keep-in zones exist
+        if (_redis.StringGet("keepIn").IsNullOrEmpty)
+        {
+            endpointReturn.error = "No keep-in zones found.";
+            return BadRequest(endpointReturn.ToString());
+        }
+
+        endpointReturn.message = "Cleared keep-in zones successfully.";
+        endpointReturn.data = _redis.KeyDeleteAsync("keepIn").ToString();
+        return Ok(endpointReturn.ToString());
     }
 
-    [HttpDelete("zones/out")]
-     public async Task<IActionResult> clearKeepOut()
+     [HttpDelete("zones/out")]
+     public IActionResult clearKeepOut()
     {
-        await _redis.KeyDeleteAsync("keepOut");
-        return Ok("keep-out zones cleared successfully.");
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
+        // check keep-in zones exist
+        if (_redis.StringGet("keepOut").IsNullOrEmpty)
+        {
+            endpointReturn.error = "No keep-in zones found.";
+            return BadRequest(endpointReturn.ToString());
+        }
+
+        endpointReturn.message = "Cleared keep-out zones successfully.";
+        endpointReturn.data = _redis.KeyDeleteAsync("keepOut").ToString();
+        return Ok(endpointReturn.ToString());
     }
 
 }
