@@ -159,16 +159,18 @@ public class ZonesController : ControllerBase
         return Ok(endpointReturn.ToString());
     } // end postKeepOut
 
-    // [HttpDelete("zones/in")]
-    // public async Task delKeepIn([FromBody] Zone requestBody)
-    // {
-    //     return key;
-    // }
+    [HttpDelete("zones/in")]
+     public async Task<IActionResult> clearKeepIn()
+    {
+        await _redis.KeyDeleteAsync("keepIn");
+        return Ok("keep-in zones cleared successfully.");
+    }
 
-    // [HttpDelete("zones/out")]
-    // public async Task delKeepOut([FromBody] Zone requestBody)
-    // {
-    //     return key;
-    // }
+    [HttpDelete("zones/out")]
+     public async Task<IActionResult> clearKeepOut()
+    {
+        await _redis.KeyDeleteAsync("keepOut");
+        return Ok("keep-out zones cleared successfully.");
+    }
 
 }
