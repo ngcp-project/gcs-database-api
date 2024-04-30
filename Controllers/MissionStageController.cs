@@ -1,26 +1,28 @@
-using System.Reflection;
-using Database.Models;
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
+using Database.Models;
+using System.Reflection;
+using System.Text.Json;
 
-namespace Database.Controllers;
-public class VehicleDataController : ControllerBase
+public class MissionStageController : ControllerBase
 {
     private ConnectionMultiplexer conn;
-    private readonly IDatabase _redis;
+    private readonly IDatabase gcs;
 
-    public VehicleDataController()
+    public MissionStageController()
     {
         conn = DBConn.Instance().getConn();
-        _redis = conn.GetDatabase();
+        gcs = conn.GetDatabase();
     }
-    [HttpGet("vehicleData")]
-    public IActionResult getVehicleData([FromBody] VehicleKey requestBody)
+
+
+    [HttpGet("MissionStage")]
+    public IActionResult GetMissionStage([FromBody] MissionStageGET requestBody)
     {
         List<string> missingFields = new List<string>();
 
         EndpointReturn endpointReturn = new EndpointReturn("", "", "");
-        Type type = typeof(VehicleKey);
+        Type type = typeof(MissionStageGET);
         PropertyInfo[] properties = type.GetProperties();
 
         foreach (System.Reflection.PropertyInfo property in properties)
@@ -31,6 +33,7 @@ public class VehicleDataController : ControllerBase
             {
                 defaultValue = null;
             }
+
             else if (property.PropertyType.IsValueType)
             {
                 defaultValue = Activator.CreateInstance(property.PropertyType);
@@ -40,27 +43,25 @@ public class VehicleDataController : ControllerBase
             {
                 missingFields.Add(property.Name);
             }
-
             if (missingFields.Count > 0)
             {
                 endpointReturn.error = "Missing fields: " + string.Join(", ", missingFields);
                 return BadRequest(endpointReturn.ToString());
             }
         }
-        // return vehicle data
-        Console.WriteLine(requestBody.Key + "-geo");
-        endpointReturn.data = _redis.StringGet(requestBody.Key + "-geo").ToString();
+        string result = gcs.StringGet("missionStage-" + requestBody.stageId);
+        endpointReturn.data = result;
         return Ok(endpointReturn.ToString());
-
     }
 
-    [HttpPost("vehicleData")]
-    public async Task<IActionResult> postVehicleData([FromBody] VehicleData requestBody)
+
+    [HttpPost("MissionStage")]
+    public async Task<IActionResult> SetMissionStage([FromBody] MissionStage requestBody)
     {
         List<string> missingFields = new List<string>();
 
         EndpointReturn endpointReturn = new EndpointReturn("", "", "");
-        Type type = typeof(VehicleData);
+        Type type = typeof(MissionStage);
         PropertyInfo[] properties = type.GetProperties();
 
         foreach (System.Reflection.PropertyInfo property in properties)
@@ -71,6 +72,7 @@ public class VehicleDataController : ControllerBase
             {
                 defaultValue = null;
             }
+
             else if (property.PropertyType.IsValueType)
             {
                 defaultValue = Activator.CreateInstance(property.PropertyType);
@@ -80,7 +82,6 @@ public class VehicleDataController : ControllerBase
             {
                 missingFields.Add(property.Name);
             }
-
             if (missingFields.Count > 0)
             {
                 endpointReturn.error = "Missing fields: " + string.Join(", ", missingFields);
@@ -88,9 +89,28 @@ public class VehicleDataController : ControllerBase
             }
 
         }
-        await _redis.StringSetAsync(requestBody.vehicleName + "-geo", requestBody.ToString());
-        endpointReturn.message = "Posted VehicleData Successfully!";
+
+        // Enum Validation
+        if (!Enum.IsDefined(typeof(Stage_Enum), requestBody.stageStatus))
+        {
+            endpointReturn.error = "Invalid Stage_Enum";
+            return BadRequest(endpointReturn.ToString());
+        }
+
+        // if (gcs.StringGet("missionStage-" + requestBody.stageId).IsNullOrEmpty)
+        // {
+        //     await gcs.StringSetAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
+        //     return Ok("Posted MissionStage");
+        // }
+        // // Initializes mission stage entry if it does not exist
+
+        // MissionStage currentMissionStageEntry = JsonSerializer.Deserialize<MissionStage>(gcs.StringGet("missionStage-" + requestBody.stageId));
+
+
+
+        // await gcs.StringAppendAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
+        await gcs.StringSetAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
+        endpointReturn.message = "Posted MissionStage";
         return Ok(endpointReturn.ToString());
     }
-
 }
