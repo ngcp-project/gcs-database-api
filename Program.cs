@@ -27,8 +27,12 @@ var app = builder.Build();
 //     app.UseSwagger();
 //     app.UseSwaggerUI();
 // }
-
-// app.UseHttpsRedirection();
+app.UseCors(builder =>
+{
+    builder.WithOrigins("http://localhost:4000") // Allow requests from your Vue.js frontend
+           .AllowAnyHeader()
+           .AllowAnyMethod();
+});
 app.UseWebSockets();
 
 app.UseAuthorization();

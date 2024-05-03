@@ -23,7 +23,7 @@ services:
     image: rabbitmq:3.12-management
     ports:
       - 5672:5672
-      - 13672:15672
+      - 15672:15672
   
 volumes:
   redis-data:
