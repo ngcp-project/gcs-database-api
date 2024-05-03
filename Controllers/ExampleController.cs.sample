@@ -22,8 +22,10 @@ public class ExampleController : ControllerBase
     [HttpGet("example")]
     public IActionResult getExample()
     {
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
         string result = _redis.StringGet("example"); // Replace "example" with the respective database key
-        return Ok(result);
+        endpointReturn.data = result;
+        return Ok(endpointReturn.ToString());
     }
 
     [HttpPost("example")]
@@ -31,6 +33,7 @@ public class ExampleController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
         Type type = typeof(ExampleModel); // Replace ExampleModel with the respective model
         PropertyInfo[] properties = type.GetProperties();
         foreach (System.Reflection.PropertyInfo property in requestBody.GetType().GetProperties())
@@ -56,11 +59,13 @@ public class ExampleController : ControllerBase
 
         if (missingFields.Count > 0)
         {
-            return BadRequest("Missing fields: " + string.Join(", ", missingFields));
+            endpointReturn.error = "Missing fields: " + string.Join(", ", missingFields);
+            return BadRequest(endpointReturn.ToString());
         }
         // If any field is missing, return a bad request
 
         await _redis.StringSetAsync("example", requestBody.ExampleString); // Replace "example" with the respective database key
-        return Ok("hi");
+        endpointReturn.message = "hi";
+        return Ok(endpointReturn.ToString());
     }
 }

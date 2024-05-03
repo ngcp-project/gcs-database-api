@@ -1,26 +1,29 @@
-using System.Reflection;
-using Database.Models;
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
+using Database.Models;
+using System.Reflection;
+
 
 namespace Database.Controllers;
-public class VehicleDataController : ControllerBase
+public class MissionInfoController : ControllerBase
 {
     private ConnectionMultiplexer conn;
-    private readonly IDatabase _redis;
+    private readonly IDatabase gcs;
 
-    public VehicleDataController()
+    public MissionInfoController()
     {
         conn = DBConn.Instance().getConn();
-        _redis = conn.GetDatabase();
+        gcs = conn.GetDatabase();
     }
-    [HttpGet("vehicleData")]
-    public IActionResult getVehicleData([FromBody] VehicleKey requestBody)
+
+    [HttpGet("MissionInfo")]
+    public IActionResult GetMissionInfo([FromBody] MissionInfoGET requestBody)
     {
+
         List<string> missingFields = new List<string>();
 
         EndpointReturn endpointReturn = new EndpointReturn("", "", "");
-        Type type = typeof(VehicleKey);
+        Type type = typeof(MissionInfoGET);
         PropertyInfo[] properties = type.GetProperties();
 
         foreach (System.Reflection.PropertyInfo property in properties)
@@ -31,6 +34,7 @@ public class VehicleDataController : ControllerBase
             {
                 defaultValue = null;
             }
+
             else if (property.PropertyType.IsValueType)
             {
                 defaultValue = Activator.CreateInstance(property.PropertyType);
@@ -40,27 +44,26 @@ public class VehicleDataController : ControllerBase
             {
                 missingFields.Add(property.Name);
             }
-
             if (missingFields.Count > 0)
             {
                 endpointReturn.error = "Missing fields: " + string.Join(", ", missingFields);
                 return BadRequest(endpointReturn.ToString());
             }
-        }
-        // return vehicle data
-        Console.WriteLine(requestBody.Key + "-geo");
-        endpointReturn.data = _redis.StringGet(requestBody.Key + "-geo").ToString();
-        return Ok(endpointReturn.ToString());
 
+        }
+        string result = gcs.StringGet(requestBody.missionName).ToString();
+        endpointReturn.data = result;
+        return Ok(endpointReturn.ToString());
     }
 
-    [HttpPost("vehicleData")]
-    public async Task<IActionResult> postVehicleData([FromBody] VehicleData requestBody)
+
+    [HttpPost("MissionInfo")]
+    public async Task<IActionResult> SetMissionInfo([FromBody] MissionInfo requestBody)
     {
         List<string> missingFields = new List<string>();
 
         EndpointReturn endpointReturn = new EndpointReturn("", "", "");
-        Type type = typeof(VehicleData);
+        Type type = typeof(MissionInfo);
         PropertyInfo[] properties = type.GetProperties();
 
         foreach (System.Reflection.PropertyInfo property in properties)
@@ -71,6 +74,7 @@ public class VehicleDataController : ControllerBase
             {
                 defaultValue = null;
             }
+
             else if (property.PropertyType.IsValueType)
             {
                 defaultValue = Activator.CreateInstance(property.PropertyType);
@@ -80,17 +84,24 @@ public class VehicleDataController : ControllerBase
             {
                 missingFields.Add(property.Name);
             }
-
             if (missingFields.Count > 0)
             {
                 endpointReturn.error = "Missing fields: " + string.Join(", ", missingFields);
                 return BadRequest(endpointReturn.ToString());
             }
-
         }
-        await _redis.StringSetAsync(requestBody.vehicleName + "-geo", requestBody.ToString());
-        endpointReturn.message = "Posted VehicleData Successfully!";
+
+        if (gcs.StringGet("missionStage-" + requestBody.currentStageId).IsNullOrEmpty)
+        {
+            endpointReturn.error = "Invalid Stage ID: Please initialize one or reference an existing one.";
+            return BadRequest(endpointReturn.ToString());
+        }
+
+
+
+        // await gcs.StringAppendAsync(requestBody.missionName, requestBody.ToString());
+        await gcs.StringSetAsync(requestBody.missionName, requestBody.ToString());
+        endpointReturn.message = "Posted MissionInfo";
         return Ok(endpointReturn.ToString());
     }
-
 }
