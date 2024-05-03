@@ -126,6 +126,7 @@ public async Task<IActionResult> EmergencyStop([FromBody] VehicleKey requestBody
     {
         var replyQueueName = channel.QueueDeclare().QueueName;
         var consumer = new EventingBasicConsumer(channel);
+        var responseTask = new TaskCompletionSource<IActionResult>();
         var correlationId = Guid.NewGuid().ToString();
         var props = channel.CreateBasicProperties();
         props.CorrelationId = correlationId;
@@ -146,12 +147,9 @@ public async Task<IActionResult> EmergencyStop([FromBody] VehicleKey requestBody
         channel.BasicPublish(exchange: "", routingKey: "rpc_queue", basicProperties: props, body: messageBytes);
         channel.BasicConsume(consumer: consumer, queue: replyQueueName, autoAck: true);
 
-        // Wait for response with a timeout
-        await Task.Delay(3000); // wait for 3 seconds for the response
-        if (HttpContext.Items["RabbitMQResponse"] != null)
-            return Ok(HttpContext.Items["RabbitMQResponse"]);
-        else
-            return BadRequest("No response from vehicle server.");
+        _ = Task.Delay(3000).ContinueWith(task => responseTask.TrySetResult(BadRequest("No response from vehicle server.")));
+
+        return await responseTask.Task;  // This will return as soon as the response is set or the timeout expires
     }
 }
 
