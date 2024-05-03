@@ -6,6 +6,7 @@ using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using System.Diagnostics;
 using Database.Models;
+using System.Text.Json;
 
 public class ZoneTest {
     [Test]
@@ -41,11 +42,13 @@ public class ZoneTest {
         RestRequest restRequest = new RestRequest(baseUrl, Method.Post);
         Coordinate coord1 = new Coordinate(1.0, 2.0);
         Coordinate coord2 = new Coordinate(1.5, 2.69);
+        string coor1 = JsonSerializer.Serialize(coord1);
+        string coor2 = JsonSerializer.Serialize(coord2);
         var coordArray = new Coordinate[] {coord1, coord2};
         restRequest.AddJsonBody(new {
             name = "Mexico",
             shapeType = "Polygon",
-            coordinates = coordArray
+            coordinates = coordArray,
         });
         //Act
         var queryResult = client.Execute(restRequest);
