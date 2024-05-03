@@ -28,7 +28,8 @@ public class ZonesController : ControllerBase
             return BadRequest(endpointReturn.ToString());
         }
 
-        return Ok(_redis.StringGet("keepIn").ToString().Split("|"));
+        endpointReturn.data = _redis.StringGet("keepIn").ToString();
+        return Ok(endpointReturn.ToString());
     }
 
     [HttpGet("zones/out")]
@@ -171,7 +172,6 @@ public class ZonesController : ControllerBase
         }
 
         endpointReturn.message = "Cleared keep-in zones successfully.";
-        endpointReturn.data = _redis.KeyDeleteAsync("keepIn").ToString();
         return Ok(endpointReturn.ToString());
     }
 
@@ -187,7 +187,6 @@ public class ZonesController : ControllerBase
         }
 
         endpointReturn.message = "Cleared keep-out zones successfully.";
-        endpointReturn.data = _redis.KeyDeleteAsync("keepOut").ToString();
         return Ok(endpointReturn.ToString());
     }
 
