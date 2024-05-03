@@ -174,7 +174,6 @@ public async Task<IActionResult> EmergencyStop([FromBody] VehicleKey requestBody
 
         int status = 0; 
         string key = $"{name}-status";
-        endpointReturn.message = $"name: {name}, key: {key}";
         status = (int)gcs.StringGet(key);
 
         
@@ -195,7 +194,7 @@ public async Task<IActionResult> EmergencyStop([FromBody] VehicleKey requestBody
                 output = "Invalid";
                 break;
         }
-        endpointReturn.message = output;
+        endpointReturn.data = output;
         return Ok(endpointReturn.ToString());
     }
 }
