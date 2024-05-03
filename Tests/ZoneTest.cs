@@ -39,10 +39,13 @@ public class ZoneTest {
         var baseUrl = "http://localhost:5135/EmergencyStop";
         RestClient client = new RestClient(baseUrl);
         RestRequest restRequest = new RestRequest(baseUrl, Method.Post);
+        Coordinate coord1 = new Coordinate(1.0, 2.0);
+        Coordinate coord2 = new Coordinate(1.5, 2.69);
+        var coordArray = new Coordinate[] {coord1, coord2};
         restRequest.AddJsonBody(new {
             name = "Mexico",
             shapeType = "Polygon",
-            coordinates = new Coordinate {latitude = 2.5, longitude = 2.5}
+            coordinates = coordArray
         });
         //Act
         var queryResult = client.Execute(restRequest);
