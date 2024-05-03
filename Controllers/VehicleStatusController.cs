@@ -63,7 +63,7 @@ public class VehicleStatusController : ControllerBase
         // If any field is missing, return a bad request
 
         await gcs.StringSetAsync($"{requestBody.Key}-status", "1"); // Replace "example" with the respective database key
-        endpointReturn.message = "In Use";
+        endpointReturn.message = $"{requestBody.Key} status set to In Use.";
         return Ok(endpointReturn.ToString());
     }
 
@@ -104,7 +104,7 @@ public class VehicleStatusController : ControllerBase
         // If any field is missing, return a bad request
 
         await gcs.StringSetAsync($"{requestBody.Key}-status", "2"); // Replace "example" with the respective database key
-        endpointReturn.message = "Standby";
+        endpointReturn.message = $"{requestBody.Key} status set to Standby.";
         return Ok(endpointReturn.ToString());
     }
 
@@ -162,19 +162,24 @@ public async Task<IActionResult> EmergencyStop([FromBody] VehicleKey requestBody
 
 
     [HttpGet("GetVehicleStatus")]
-    public async Task<string> GetVehicleStatus()
+    public IActionResult GetVehicleStatus([FromQuery]string name)
     {
-        int num = 0; //Default of 0, database value will be read into this variable
-        using (var sr = new StreamReader(Request.Body))
+        EndpointReturn endpointReturn = new EndpointReturn("","","");
+
+        if (gcs.StringGet($"{name}-status").IsNullOrEmpty)
         {
-            string vehicleData = await sr.ReadToEndAsync();
-            VehicleKey? vehicleKey = JsonSerializer.Deserialize<VehicleKey>(vehicleData);
-            string key = $"{vehicleKey?.Key}-status";
-            num = (int)await gcs.StringGetAsync(key);
+            endpointReturn.error = $"{name}-status not found.";
+            return BadRequest(endpointReturn.ToString());
         }
+
+        int status = 0; 
+        string key = $"{name}-status";
+        status = (int)gcs.StringGet(key);
+
+        
         string output; //output string, will be returned. 
         //Switch block to conert int value in database to string value for enum. 
-        switch (num)
+        switch (status)
         {
             case 1:
                 output = "In Use";
@@ -189,6 +194,7 @@ public async Task<IActionResult> EmergencyStop([FromBody] VehicleKey requestBody
                 output = "Invalid";
                 break;
         }
-        return output;
+        endpointReturn.data = output;
+        return Ok(endpointReturn.ToString());
     }
 }
