@@ -8,8 +8,7 @@ namespace Database.Models
         public float roll { get; set; }
         public float altitude { get; set; }
         public float batteryLife { get; set; }
-        public string lastUpdated { get; set; }
+        public double lastUpdated { get; set; }
         public Coordinate currentPosition { get; set; }
-        public Status_Enum vehicleStatus { get; set; }
     }
 }
