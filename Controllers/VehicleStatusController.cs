@@ -127,7 +127,7 @@ public async Task<IActionResult> EmergencyStop([FromBody] VehicleKey requestBody
         return BadRequest("Missing fields: " + string.Join(", ", missingFields));
 
     // RabbitMQ Part
-    var factory = new ConnectionFactory() { HostName = "localhost" };
+        var factory = new ConnectionFactory() { HostName = "localhost" };
     using (var connection = factory.CreateConnection())
     using (var channel = connection.CreateModel())
     {
@@ -144,8 +144,7 @@ public async Task<IActionResult> EmergencyStop([FromBody] VehicleKey requestBody
             if (ea.BasicProperties.CorrelationId == correlationId)
             {
                 var response = Encoding.UTF8.GetString(ea.Body.ToArray());
-                // Handle response here
-                HttpContext.Items["RabbitMQResponse"] = response;
+                responseTask.TrySetResult(Ok(response)); 
             }
         };
 
@@ -154,9 +153,18 @@ public async Task<IActionResult> EmergencyStop([FromBody] VehicleKey requestBody
         channel.BasicPublish(exchange: "", routingKey: "rpc_queue", basicProperties: props, body: messageBytes);
         channel.BasicConsume(consumer: consumer, queue: replyQueueName, autoAck: true);
 
-        _ = Task.Delay(3000).ContinueWith(task => responseTask.TrySetResult(BadRequest("No response from vehicle server.")));
+        var cts = new CancellationTokenSource();
+        _ = Task.Delay(3000, cts.Token).ContinueWith(task => 
+        {
+            if (task.IsCompletedSuccessfully && !responseTask.Task.IsCompleted)
+            {
+                responseTask.TrySetResult(BadRequest("No response from vehicle server."));
+            }
+        }, TaskScheduler.Default);
 
-        return await responseTask.Task;  // This will return as soon as the response is set or the timeout expires
+        var result = await responseTask.Task; 
+        cts.Cancel(); 
+        return result;
     }
 }
 
