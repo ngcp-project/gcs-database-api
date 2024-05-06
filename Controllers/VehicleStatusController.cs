@@ -108,9 +108,7 @@ public class VehicleStatusController : ControllerBase
         return Ok(endpointReturn.ToString());
     }
 
-  [HttpPost("EmergencyStop")]
-public async Task<IActionResult> EmergencyStop([FromBody] VehicleKey requestBody)
-{
+
     List<string> missingFields = new List<string>();
   [HttpPost("EmergencyStop")]
 public async Task<IActionResult> EmergencyStop([FromBody] VehicleKey requestBody)
