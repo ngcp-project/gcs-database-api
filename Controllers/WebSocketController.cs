@@ -57,7 +57,7 @@ namespace Database.Controllers
                 CancellationTokenSource tokenSource = new();
 
                 // Start the RabbitMQ consumer in a separate task
-                Task task = Task.Run(() => ListenToRabbitMq(ws, queueName, tokenSource.Token));
+                Task task = Task.Run(() => ListenToRabbitMq(ws, queueName, tokenSource.Token, vehicleName));
 
                 byte[] buffer = new byte[1024 * 4];
                 WebSocketReceiveResult result;
@@ -88,7 +88,7 @@ namespace Database.Controllers
         * <param name="queueName">RabbitMQ consumer queueName. Format: telemetry_vehiclename (all lowercase)</param>
         * <param name="cancellationToken">Token used to cancel or dispose of RabbitMQ consumer</param>
         */
-        private async Task ListenToRabbitMq(WebSocket ws, string queueName, CancellationToken cancellationToken)
+        private async Task ListenToRabbitMq(WebSocket ws, string queueName, CancellationToken cancellationToken, string vehicleName)
         {   
             // Add a callback function to RabbitMQ
             // NOTE: This will be triggered whenever a RabbitMQ message is received
@@ -110,7 +110,7 @@ namespace Database.Controllers
                 }
 
                 // Get Vehicle key
-                var vehicleKey = vehicleData.key;
+                var vehicleKey = vehicleName;
 
                 // Save vehicle data to database
                 _logger.Log(LogLevel.Information, "Saving vehicle data to database!");
