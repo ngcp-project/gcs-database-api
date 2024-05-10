@@ -109,7 +109,7 @@ public class MissionStageController : ControllerBase
 
 
         // await gcs.StringAppendAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
-        await gcs.StringSetAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
+        await gcs.StringSetAsync("missionStage-" + requestBody.stageName, requestBody.ToString());
         endpointReturn.message = "Posted MissionStage";
         return Ok(endpointReturn.ToString());
     }
