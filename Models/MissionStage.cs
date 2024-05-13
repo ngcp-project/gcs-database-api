@@ -9,6 +9,7 @@ namespace Database.Models
         public string stageName { get; set; }
         public string stageStatus { get; set; }
         private Stage_Enum MissionStageStatus { get; set; }
+        public VehicleData[] vehicleKeys {get; set; }
 
         public MissionStage(string key, string stageId, string stageName, string stageStatus)
         {
