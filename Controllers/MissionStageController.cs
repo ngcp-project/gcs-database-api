@@ -17,7 +17,7 @@ public class MissionStageController : ControllerBase
 
 
     [HttpGet("MissionStage")]
-    public IActionResult GetMissionStage([FromBody] MissionStageGET requestBody)
+    public IActionResult GetMissionStage([FromQuery] MissionStageGET requestBody)
     {
         List<string> missingFields = new List<string>();
 
@@ -97,18 +97,6 @@ public class MissionStageController : ControllerBase
             return BadRequest(endpointReturn.ToString());
         }
 
-        // if (gcs.StringGet("missionStage-" + requestBody.stageId).IsNullOrEmpty)
-        // {
-        //     await gcs.StringSetAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
-        //     return Ok("Posted MissionStage");
-        // }
-        // // Initializes mission stage entry if it does not exist
-
-        // MissionStage currentMissionStageEntry = JsonSerializer.Deserialize<MissionStage>(gcs.StringGet("missionStage-" + requestBody.stageId));
-
-
-
-        // await gcs.StringAppendAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
         await gcs.StringSetAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
         endpointReturn.message = "Posted MissionStage";
         return Ok(endpointReturn.ToString());
