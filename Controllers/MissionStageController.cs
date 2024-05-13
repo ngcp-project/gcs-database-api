@@ -49,6 +49,33 @@ public class MissionStageController : ControllerBase
                 return BadRequest(endpointReturn.ToString());
             }
         }
+
+        if (gcs.StringGet(requestBody.missionName).IsNullOrEmpty)
+        {
+            endpointReturn.error = "Inputted MissionInfo does not exist";
+            return BadRequest(endpointReturn.ToString());
+        }
+
+        MissionInfo missionInfo = JsonSerializer.Deserialize<MissionInfo>(gcs.StringGet(requestBody.missionName));
+        List<MissionStage> stages = missionInfo.stages.ToList();
+
+        bool foundMissionStage = false;
+        foreach (MissionStage stage in stages)
+        {
+            if (stage.stageName == requestBody.stageName)
+            {
+                endpointReturn.data = JsonSerializer.Serialize(stage);
+                endpointReturn.message = "Found MissionStage";
+                foundMissionStage = true;
+                break;
+            }
+        }
+
+        if (!foundMissionStage)
+        {
+            endpointReturn.error = "Inputted MissionStage does not exist";
+            return BadRequest(endpointReturn.ToString());
+        }
         
         return Ok(endpointReturn.ToString());
     }
