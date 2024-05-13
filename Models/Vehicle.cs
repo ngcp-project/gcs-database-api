@@ -12,5 +12,6 @@ namespace Database.Models
         public Coordinate currentPosition { get; set; }
         public bool? fireFound { get; set; }
         public Coordinate? fireCoordinate { get; set; }
+        public string? localIP { get; set; }
     }
 }

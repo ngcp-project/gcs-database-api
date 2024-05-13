@@ -10,8 +10,6 @@ namespace Database.Models
         public Coordinate target { get; set; }
         public Coordinate[] searchArea { get; set; }
 
-        public String localIP { get; set; }
-
         public override string ToString()
         {
             return JsonSerializer.Serialize(this);
