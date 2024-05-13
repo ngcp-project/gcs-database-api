@@ -58,12 +58,12 @@ public class MissionInfoController : ControllerBase
 
 
     [HttpPost("MissionInfo")]
-    public async Task<IActionResult> SetMissionInfo([FromBody] MissionInfoGET requestBody)
+    public async Task<IActionResult> SetMissionInfo([FromBody] MissionInfoPOST requestBody)
     {
         List<string> missingFields = new List<string>();
 
         EndpointReturn endpointReturn = new EndpointReturn("", "", "");
-        Type type = typeof(MissionInfoGET);
+        Type type = typeof(MissionInfoPOST);
         PropertyInfo[] properties = type.GetProperties();
 
         foreach (System.Reflection.PropertyInfo property in properties)
