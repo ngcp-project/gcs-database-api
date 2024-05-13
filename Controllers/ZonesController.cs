@@ -82,6 +82,11 @@ public class ZonesController : ControllerBase
             // If any field is missing, return a bad request
         }
         requestBody.keepIn = true;
+        if (requestBody.zoneShapeType == ShapeType.Unknown)
+        {
+            endpointReturn.error = "Invalid shape type";
+            return BadRequest(endpointReturn.ToString());
+        }
 
         Console.WriteLine(requestBody.ToString());
         if (_redis.StringGet("keepIn").IsNullOrEmpty)
@@ -131,6 +136,14 @@ public class ZonesController : ControllerBase
                 return BadRequest(endpointReturn.ToString());
             }
 
+        }
+
+        // validate shape type
+        requestBody.keepIn = false;
+        if (requestBody.zoneShapeType == ShapeType.Unknown)
+        {
+            endpointReturn.error = "Invalid shape type";
+            return BadRequest(endpointReturn.ToString());
         }
 
 

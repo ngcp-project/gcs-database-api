@@ -9,7 +9,7 @@ namespace Database.Models
         public string stageName { get; set; }
         public string stageStatus { get; set; }
         private Stage_Enum MissionStageStatus { get; set; }
-        public VehicleData[] vehicleKeys {get; set; }
+        public VehicleData[] vehicleKeys { get; set; }
 
         public MissionStage(string key, string stageId, string stageName, string stageStatus)
         {
@@ -41,6 +41,7 @@ namespace Database.Models
                 this.MissionStageStatus = Stage_Enum.UNKNOWN;
             }
 
+            this.vehicleKeys = vehicleKeys;
         }
 
         public override string ToString()
@@ -50,7 +51,8 @@ namespace Database.Models
                 key = this.key,
                 stageId = this.stageId,
                 stageName = this.stageName,
-                stageStatus = this.MissionStageStatus
+                stageStatus = this.MissionStageStatus,
+                vehicleKeys = this.vehicleKeys
             };
 
             return JsonSerializer.Serialize(objectToSerialize);
