@@ -10,9 +10,5 @@ namespace Database.Models
         public float batteryLife { get; set; }
         public double lastUpdated { get; set; }
         public Coordinate currentPosition { get; set; }
-        [optional]
-        public bool fireFound { get; set; }
-        [optional]
-        public Coordinate fireCoordinate { get; set; }
     }
 }

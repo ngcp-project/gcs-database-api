@@ -17,7 +17,7 @@ public class MissionInfoController : ControllerBase
     }
 
     [HttpGet("MissionInfo")]
-    public IActionResult GetMissionInfo([FromQuery] MissionInfoGET requestBody)
+    public IActionResult GetMissionInfo([FromBody] MissionInfoGET requestBody)
     {
 
         List<string> missingFields = new List<string>();
