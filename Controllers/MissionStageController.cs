@@ -15,6 +15,46 @@ public class MissionStageController : ControllerBase
         gcs = conn.GetDatabase();
     }
 
+
+    [HttpGet("MissionStage")]
+    public IActionResult GetMissionStage([FromQuery] MissionStageGET requestBody)
+    {
+        List<string> missingFields = new List<string>();
+
+        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
+        Type type = typeof(MissionStageGET);
+        PropertyInfo[] properties = type.GetProperties();
+
+        foreach (System.Reflection.PropertyInfo property in properties)
+        {
+            var value = property.GetValue(requestBody, null);
+            object defaultValue = null;
+            if (property.PropertyType == typeof(string))
+            {
+                defaultValue = null;
+            }
+
+            else if (property.PropertyType.IsValueType)
+            {
+                defaultValue = Activator.CreateInstance(property.PropertyType);
+            }
+
+            if (value?.Equals(defaultValue) == true || value == null)
+            {
+                missingFields.Add(property.Name);
+            }
+            if (missingFields.Count > 0)
+            {
+                endpointReturn.error = "Missing fields: " + string.Join(", ", missingFields);
+                return BadRequest(endpointReturn.ToString());
+            }
+        }
+        string result = gcs.StringGet("missionStage-" + requestBody.stageId);
+        endpointReturn.data = result;
+        return Ok(endpointReturn.ToString());
+    }
+
+
     [HttpPost("MissionStage")]
     public async Task<IActionResult> SetMissionStage([FromBody] MissionStage requestBody)
     {
@@ -57,17 +97,7 @@ public class MissionStageController : ControllerBase
             return BadRequest(endpointReturn.ToString());
         }
 
-        // if (gcs.StringGet("missionStage-" + requestBody.stageId).IsNullOrEmpty)
-        // {
-        //     await gcs.StringSetAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
-        //     return Ok("Posted MissionStage");
-        // }
-        // // Initializes mission stage entry if it does not exist
-
-        // MissionStage currentMissionStageEntry = JsonSerializer.Deserialize<MissionStage>(gcs.StringGet("missionStage-" + requestBody.stageId));
-
-
-
+        await gcs.StringSetAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
         endpointReturn.message = "Posted MissionStage";
         return Ok(endpointReturn.ToString());
     }
