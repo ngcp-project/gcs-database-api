@@ -17,12 +17,12 @@ public class MissionStageController : ControllerBase
 
 
     [HttpGet("MissionStage")]
-    public IActionResult GetMissionStage([FromQuery] MissionStageGET requestBody)
+    public IActionResult GetMissionStage([FromQuery] MissionStageQuery requestBody)
     {
         List<string> missingFields = new List<string>();
 
         EndpointReturn endpointReturn = new EndpointReturn("", "", "");
-        Type type = typeof(MissionStageGET);
+        Type type = typeof(MissionStageQuery);
         PropertyInfo[] properties = type.GetProperties();
 
         foreach (System.Reflection.PropertyInfo property in properties)
@@ -49,19 +49,18 @@ public class MissionStageController : ControllerBase
                 return BadRequest(endpointReturn.ToString());
             }
         }
-        string result = gcs.StringGet("missionStage-" + requestBody.stageId);
-        endpointReturn.data = result;
+        
         return Ok(endpointReturn.ToString());
     }
 
 
     [HttpPost("MissionStage")]
-    public async Task<IActionResult> SetMissionStage([FromBody] MissionStage requestBody)
+    public async Task<IActionResult> SetMissionStage([FromBody] MissionStagePOST requestBody)
     {
         List<string> missingFields = new List<string>();
 
         EndpointReturn endpointReturn = new EndpointReturn("", "", "");
-        Type type = typeof(MissionStage);
+        Type type = typeof(MissionStagePOST);
         PropertyInfo[] properties = type.GetProperties();
 
         foreach (System.Reflection.PropertyInfo property in properties)
@@ -90,25 +89,27 @@ public class MissionStageController : ControllerBase
 
         }
 
-        // Enum Validation
-        if (!Enum.IsDefined(typeof(Stage_Enum), requestBody.stageStatus))
+        if (gcs.StringGet(requestBody.missionName).IsNullOrEmpty)
         {
-            endpointReturn.error = "Invalid Stage_Enum";
+            endpointReturn.error = "Inputted MissionInfo does not exist";
             return BadRequest(endpointReturn.ToString());
         }
 
-        await gcs.StringSetAsync("missionStage-" + requestBody.stageId, requestBody.ToString());
+        MissionInfo missionInfo = JsonSerializer.Deserialize<MissionInfo>(gcs.StringGet(requestBody.missionName));
+        missionInfo.stages = requestBody.stages;
+        await gcs.StringSetAsync(requestBody.missionName, missionInfo.ToString());
+
         endpointReturn.message = "Posted MissionStage";
         return Ok(endpointReturn.ToString());
     }
 
     [HttpDelete("MissionStage")]
-    public async Task<IActionResult> DeleteMissionStage([FromBody] MissionStageDELETE requestBody)
+    public async Task<IActionResult> DeleteMissionStage([FromBody] MissionStageQuery requestBody)
     {
         List<string> missingFields = new List<string>();
 
         EndpointReturn endpointReturn = new EndpointReturn("", "", "");
-        Type type = typeof(MissionStageDELETE);
+        Type type = typeof(MissionStageQuery);
         PropertyInfo[] properties = type.GetProperties();
 
         foreach (System.Reflection.PropertyInfo property in properties)

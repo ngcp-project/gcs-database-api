@@ -1,8 +1,8 @@
 namespace Database.Models
 {
-    public class MissionStageDELETE
+    public class MissionStagePOST
     {
         public string missionName { get; set; }
-        public string stageName { get; set; }
+        public MissionStage[] stages { get; set; }
     }
 }
