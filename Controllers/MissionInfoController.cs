@@ -101,13 +101,12 @@ public class MissionInfoController : ControllerBase
             currentStageId = requestBody.stageName,
             stages = stages.ToArray()
         };
+        // Initializes new MissionInfo object with a MissionStage attached to it
+
 
         await gcs.StringSetAsync(requestBody.missionName, missionInfo.ToString());
         endpointReturn.message = "Posted MissionInfo";
         return Ok(endpointReturn.ToString());
     }
-
     
-
-
 }
