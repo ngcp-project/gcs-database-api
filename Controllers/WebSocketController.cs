@@ -60,16 +60,18 @@ namespace Database.Controllers
                 using WebSocket ws = await HttpContext.WebSockets.AcceptWebSocketAsync();
 
                 // Update number of connections for given vehicle
-                // _numVehicleConnections.AddOrUpdate(vehicleName.ToLower(), 1, (key, oldValue) => oldValue + 1);
-                // _vehicleConnIds.AddOrUpdate(vehicleName.ToLower(), new ArrayList(), (key, oldValue) => oldValue.Add(connId++);
                 string connKey = Interlocked.Increment(ref connId).ToString();
+
+                // 
+                bool newConsumer = true;
 
                 _vehicleConnIds.AddOrUpdate(vehicleName.ToLower(), new ArrayList() { connKey }, (key, oldValue) =>
                 {
+                    newConsumer = false;
                     oldValue.Add(connKey);
                     return oldValue;
                 });
-                _vehicleConnIds.TryGetValue(vehicleName, out ArrayList connIds);
+                // _vehicleConnIds.TryGetValue(vehicleName, out ArrayList connIds);
                 // foreach (string id in connIds)
                 // {
                 //     _logger.Log(LogLevel.Information, $"Connection ID: {key} Vehicle: {vehicleName.ToUpper()} ID: {id}");
@@ -88,7 +90,7 @@ namespace Database.Controllers
                 CancellationTokenSource tokenSource = null;
 
                 // Start RabbitMQ consumer if it is the first WebSocket connection
-                if (connIds.Count == 1)
+                if (newConsumer)
                 {
                     string queueName = $"telemetry_{vehicleName.ToLower()}";
                     _logger.Log(LogLevel.Information, "\nQueue: " + queueName);
@@ -169,10 +171,9 @@ namespace Database.Controllers
                 _vehicleConnIds.TryGetValue(vehicleName, out ArrayList connIds);
                 foreach (string id in connIds)
                 {
-                    _logger.Log(LogLevel.Information, "ID: " + id);
+                    // _logger.Log(LogLevel.Information, "ID: " + id);
                     if (_wsConnections.ContainsKey($"{vehicleName}_{id}"))
                     {
-                        _logger.Log(LogLevel.Information, "ID: " + id);
                         // _logger.Log(LogLevel.Information, "" + id);
                         await _wsConnections[$"{vehicleName}_{id}"].SendAsync(
                             new ArraySegment<byte>(eventArgs.Body.ToArray()),
