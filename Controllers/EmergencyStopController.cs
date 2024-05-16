@@ -7,7 +7,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 
-public class VehicleStatusController : ControllerBase
+public class EmergencyStopController : ControllerBase
 {
     private ConnectionMultiplexer conn;
     private readonly IDatabase gcs;
