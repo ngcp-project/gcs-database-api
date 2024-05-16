@@ -10,6 +10,7 @@ using Database.Models;
 using System.Collections.Concurrent;
 using System.Collections;
 using System.Configuration;
+using System.ComponentModel;
 
 namespace Database.Controllers
 {
@@ -61,11 +62,22 @@ namespace Database.Controllers
                 // Update number of connections for given vehicle
                 // _numVehicleConnections.AddOrUpdate(vehicleName.ToLower(), 1, (key, oldValue) => oldValue + 1);
                 // _vehicleConnIds.AddOrUpdate(vehicleName.ToLower(), new ArrayList(), (key, oldValue) => oldValue.Add(connId++);
-                string key = connId.ToString();
-                _vehicleConnIds.AddOrUpdate(vehicleName.ToLower(), new ArrayList(), (key, oldValue) => { oldValue.Add(connId++); return oldValue; });
+                string connKey = Interlocked.Increment(ref connId).ToString();
+
+                _vehicleConnIds.AddOrUpdate(vehicleName.ToLower(), new ArrayList() { connKey }, (key, oldValue) =>
+                {
+                    oldValue.Add(connKey);
+                    return oldValue;
+                });
+                _vehicleConnIds.TryGetValue(vehicleName, out ArrayList connIds);
+                // foreach (string id in connIds)
+                // {
+                //     _logger.Log(LogLevel.Information, $"Connection ID: {key} Vehicle: {vehicleName.ToUpper()} ID: {id}");
+                //     // _logger.Log(LogLevel.Information, "ID:" + id);
+                // }
 
                 // Create unique key for WebSocket connection
-                string wsKey = $"{vehicleName.ToLower()}_{key}";
+                string wsKey = $"{vehicleName.ToLower()}_{connKey}";
 
                 // Add WebSocket connection to dictionary
                 _wsConnections.TryAdd(wsKey, ws);
@@ -76,7 +88,7 @@ namespace Database.Controllers
                 CancellationTokenSource tokenSource = null;
 
                 // Start RabbitMQ consumer if it is the first WebSocket connection
-                if (_vehicleConnIds[vehicleName.ToLower()].Count == 1)
+                if (connIds.Count == 1)
                 {
                     string queueName = $"telemetry_{vehicleName.ToLower()}";
                     _logger.Log(LogLevel.Information, "\nQueue: " + queueName);
@@ -107,15 +119,7 @@ namespace Database.Controllers
                 }
 
                 // Remove connection from dictionary when WebSocket connection is closed
-                WebSocket ows;
-                _wsConnections.TryRemove(key, out ows);
-                // {
-                //     if (ows != ws)
-                //     {
-                //         // Add back the connection if it was removed too fast
-                //         _wsConnections.AddOrUpdate(key, ows, (p, w) => ows);
-                //     }
-                // }
+                _wsConnections.TryRemove(wsKey, out WebSocket ows);
 
                 _logger.Log(LogLevel.Error, "Websocket connection aborted!");
             }
@@ -162,13 +166,15 @@ namespace Database.Controllers
 
                 _logger.Log(LogLevel.Information, "Sending WebSocket messages...");
 
-                _vehicleConnIds.TryGetValue(queueName.Split("_")[1], out ArrayList connIds);
+                _vehicleConnIds.TryGetValue(vehicleName, out ArrayList connIds);
                 foreach (string id in connIds)
                 {
-                    _logger.Log(LogLevel.Information, "i");
-                    if (_wsConnections.ContainsKey($"{queueName}_{id}"))
+                    _logger.Log(LogLevel.Information, "ID: " + id);
+                    if (_wsConnections.ContainsKey($"{vehicleName}_{id}"))
                     {
-                        await _wsConnections[$"{queueName}_{id}"].SendAsync(
+                        _logger.Log(LogLevel.Information, "ID: " + id);
+                        // _logger.Log(LogLevel.Information, "" + id);
+                        await _wsConnections[$"{vehicleName}_{id}"].SendAsync(
                             new ArraySegment<byte>(eventArgs.Body.ToArray()),
                             WebSocketMessageType.Text,
                             true,
@@ -176,13 +182,6 @@ namespace Database.Controllers
                         );
                     }
                 }
-
-                // await ws.SendAsync(
-                //     new ArraySegment<byte>(eventArgs.Body.ToArray()),
-                //     WebSocketMessageType.Text,
-                //     true,
-                //     CancellationToken.None
-                // );
             };
 
             _rabbitmq.StartConsuming(queueName);
