@@ -4,13 +4,9 @@ using System.Text;
 using StackExchange.Redis;
 using RabbitMQ.Client.Events;
 using Database.Handlers;
-using System.IO;
 using System.Text.Json;
 using Database.Models;
 using System.Collections.Concurrent;
-using System.Collections;
-using System.Configuration;
-using System.ComponentModel;
 
 namespace Database.Controllers
 {
@@ -28,8 +24,10 @@ namespace Database.Controllers
         private readonly IDatabase _redis;
         private readonly RabbitMqConsumer _rabbitmq;
 
-        static readonly ConcurrentDictionary<string, ArrayList> _vehicleConnIds = new ConcurrentDictionary<string, ArrayList>();
-        static readonly ConcurrentDictionary<string, WebSocket> _wsConnections = new ConcurrentDictionary<string, WebSocket>();
+        // static readonly ConcurrentDictionary<string, ArrayList> _vehicleConnIds = new ConcurrentDictionary<string, ArrayList>();
+        // static readonly ConcurrentDictionary<string, WebSocket> _wsConnections = new ConcurrentDictionary<string, WebSocket>();
+
+        static readonly ConcurrentDictionary<string, List<WebSocket>> _wsConnections = new ConcurrentDictionary<string, List<WebSocket>>();
 
         static int connId = 0;
 
@@ -65,26 +63,15 @@ namespace Database.Controllers
                 // 
                 bool newConsumer = true;
 
-                _vehicleConnIds.AddOrUpdate(vehicleName.ToLower(), new ArrayList() { connKey }, (key, oldValue) =>
+                // Group WebSocket connections by vehicle 
+                _wsConnections.AddOrUpdate(vehicleName.ToLower(), new List<WebSocket>() { ws }, (key, oldValue) =>
                 {
                     newConsumer = false;
-                    oldValue.Add(connKey);
+                    oldValue.Add(ws);
                     return oldValue;
                 });
-                // _vehicleConnIds.TryGetValue(vehicleName, out ArrayList connIds);
-                // foreach (string id in connIds)
-                // {
-                //     _logger.Log(LogLevel.Information, $"Connection ID: {key} Vehicle: {vehicleName.ToUpper()} ID: {id}");
-                //     // _logger.Log(LogLevel.Information, "ID:" + id);
-                // }
 
-                // Create unique key for WebSocket connection
-                string wsKey = $"{vehicleName.ToLower()}_{connKey}";
-
-                // Add WebSocket connection to dictionary
-                _wsConnections.TryAdd(wsKey, ws);
-
-                _logger.Log(LogLevel.Information, $"\nWebsocket connection established with {vehicleName.ToUpper()}!\n");
+                _logger.Log(LogLevel.Information, $"\nWebsocket connection established with {vehicleName.ToUpper()}{connKey}!\n");
 
                 // Use a CancellationTokenSource to control the loop
                 CancellationTokenSource tokenSource = null;
@@ -103,27 +90,34 @@ namespace Database.Controllers
                 }
 
                 byte[] buffer = new byte[1024 * 4];
-                WebSocketReceiveResult result;
+                WebSocketReceiveResult result = null;
 
                 // Stop listening to the specific client when specified
                 do
                 {
-                    result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                    try
+                    {
+                        result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                    }
+                    catch (WebSocketException e)
+                    {
+                        break;
+                    }
                     Console.Write("-");
                     Thread.Sleep(100);
 
                 } while (!result.CloseStatus.HasValue);
 
-                if (tokenSource != null)
-                {
-                    tokenSource.Cancel();
-                    _rabbitmq.StopConsuming();
-                }
+                // if (tokenSource != null)
+                // {
+                // tokenSource.Cancel();
+                // _rabbitmq.StopConsuming();
+                // }
 
-                // Remove connection from dictionary when WebSocket connection is closed
-                _wsConnections.TryRemove(wsKey, out WebSocket ows);
+                // _logger.Log(LogLevel.Error, "ABORTING WEBSOCKET CONNECTION FOR " + vehicleName.ToUpper() + connKey + "!\n");
+                CloseWebSocketConnection(vehicleName, ws, _logger, connKey);
 
-                _logger.Log(LogLevel.Error, "Websocket connection aborted!");
+                // _logger.Log(LogLevel.Error, "Websocket connection aborted!");
             }
             else HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
         }
@@ -168,20 +162,18 @@ namespace Database.Controllers
 
                 _logger.Log(LogLevel.Information, "Sending WebSocket messages...");
 
-                _vehicleConnIds.TryGetValue(vehicleName, out ArrayList connIds);
-                foreach (string id in connIds)
+                _wsConnections.TryGetValue(vehicleName, out List<WebSocket> wsList);
+
+                // Send vehicle data to all relevant WebSocket connections
+                foreach (WebSocket wsConn in wsList)
                 {
-                    // _logger.Log(LogLevel.Information, "ID: " + id);
-                    if (_wsConnections.ContainsKey($"{vehicleName}_{id}"))
-                    {
-                        // _logger.Log(LogLevel.Information, "" + id);
-                        await _wsConnections[$"{vehicleName}_{id}"].SendAsync(
-                            new ArraySegment<byte>(eventArgs.Body.ToArray()),
-                            WebSocketMessageType.Text,
-                            true,
-                            CancellationToken.None
-                        );
-                    }
+                    await wsConn.SendAsync(
+                        new ArraySegment<byte>(eventArgs.Body.ToArray()),
+                        WebSocketMessageType.Text,
+                        true,
+                        CancellationToken.None
+                    );
+                    // }
                 }
             };
 
@@ -198,5 +190,27 @@ namespace Database.Controllers
             }
         }
 
+
+        // **NOTE: Not sure if lock is needed. Seems to work without it
+        // private static SemaphoreSlim _lock = new SemaphoreSlim(1);
+
+        private static void CloseWebSocketConnection(string vehicleName, WebSocket ws, ILogger<WebSocketController> _logger, string connKey)
+        {
+            // _lock.Wait();
+            // try
+            // {
+            // Remove WebSocket connection from list
+            _wsConnections.TryGetValue(vehicleName.ToLower(), out List<WebSocket> wsList);
+            wsList.Remove(ws);
+            _logger.Log(LogLevel.Error, "Websocket connection closed for " + vehicleName.ToUpper() + connKey + "!\n");
+
+            // Close the WebSocket connection
+            ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection closed", CancellationToken.None);
+            // }
+            // finally
+            // {
+            // _lock.Release();
+            // }
+        }
     }
 }
