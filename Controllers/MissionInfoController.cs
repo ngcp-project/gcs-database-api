@@ -17,7 +17,7 @@ public class MissionInfoController : ControllerBase
     }
 
     [HttpGet("MissionInfo")]
-    public IActionResult GetMissionInfo([FromBody] MissionInfoGET requestBody)
+    public IActionResult GetMissionInfo([FromQuery] MissionInfoGET requestBody)
     {
 
         List<string> missingFields = new List<string>();
@@ -58,12 +58,12 @@ public class MissionInfoController : ControllerBase
 
 
     [HttpPost("MissionInfo")]
-    public async Task<IActionResult> SetMissionInfo([FromBody] MissionInfo requestBody)
+    public async Task<IActionResult> SetMissionInfo([FromBody] MissionInfoPOST requestBody)
     {
         List<string> missingFields = new List<string>();
 
         EndpointReturn endpointReturn = new EndpointReturn("", "", "");
-        Type type = typeof(MissionInfo);
+        Type type = typeof(MissionInfoPOST);
         PropertyInfo[] properties = type.GetProperties();
 
         foreach (System.Reflection.PropertyInfo property in properties)
@@ -91,17 +91,22 @@ public class MissionInfoController : ControllerBase
             }
         }
 
-        if (gcs.StringGet("missionStage-" + requestBody.currentStageId).IsNullOrEmpty)
+        List<MissionStage> stages = new List<MissionStage>();
+        MissionStage initialStage = new MissionStage(requestBody.stageName, requestBody.vehicleKeys);
+        stages.Add(initialStage);
+
+        MissionInfo missionInfo = new MissionInfo
         {
-            endpointReturn.error = "Invalid Stage ID: Please initialize one or reference an existing one.";
-            return BadRequest(endpointReturn.ToString());
-        }
+            missionName = requestBody.missionName,
+            currentStageId = requestBody.stageName,
+            stages = stages.ToArray()
+        };
+        // Initializes new MissionInfo object with a MissionStage attached to it
 
 
-
-        // await gcs.StringAppendAsync(requestBody.missionName, requestBody.ToString());
-        await gcs.StringSetAsync(requestBody.missionName, requestBody.ToString());
+        await gcs.StringSetAsync(requestBody.missionName, missionInfo.ToString());
         endpointReturn.message = "Posted MissionInfo";
         return Ok(endpointReturn.ToString());
     }
+    
 }
