@@ -34,6 +34,11 @@ public class RabbitMqConsumer
         Consumer = new EventingBasicConsumer(_channel);
     }
 
+    public string GetReplyQueue()
+    {
+        return _channel.QueueDeclare().QueueName;
+    }
+
     public void StartConsuming(string queue) 
     {
         _channel.BasicConsume(
