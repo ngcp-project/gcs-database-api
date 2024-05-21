@@ -2,7 +2,6 @@ using System.Net.WebSockets;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using StackExchange.Redis;
-using RabbitMQ.Client.Events;
 using Database.Handlers;
 using System.Text.Json;
 using Database.Models;
@@ -23,9 +22,6 @@ namespace Database.Controllers
         private readonly ILogger<WebSocketController> _logger;
         private readonly IDatabase _redis;
         private readonly RabbitMqConsumer _rabbitmq;
-
-        // static readonly ConcurrentDictionary<string, ArrayList> _vehicleConnIds = new ConcurrentDictionary<string, ArrayList>();
-        // static readonly ConcurrentDictionary<string, WebSocket> _wsConnections = new ConcurrentDictionary<string, WebSocket>();
 
         static readonly ConcurrentDictionary<string, List<WebSocket>> _wsConnections = new ConcurrentDictionary<string, List<WebSocket>>();
 
@@ -114,10 +110,7 @@ namespace Database.Controllers
                 // _rabbitmq.StopConsuming();
                 // }
 
-                // _logger.Log(LogLevel.Error, "ABORTING WEBSOCKET CONNECTION FOR " + vehicleName.ToUpper() + connKey + "!\n");
                 CloseWebSocketConnection(vehicleName, ws, _logger, connKey);
-
-                // _logger.Log(LogLevel.Error, "Websocket connection aborted!");
             }
             else HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
         }
@@ -173,7 +166,6 @@ namespace Database.Controllers
                         true,
                         CancellationToken.None
                     );
-                    // }
                 }
             };
 
@@ -190,27 +182,14 @@ namespace Database.Controllers
             }
         }
 
-
-        // **NOTE: Not sure if lock is needed. Seems to work without it
-        // private static SemaphoreSlim _lock = new SemaphoreSlim(1);
-
         private static void CloseWebSocketConnection(string vehicleName, WebSocket ws, ILogger<WebSocketController> _logger, string connKey)
         {
-            // _lock.Wait();
-            // try
-            // {
-            // Remove WebSocket connection from list
             _wsConnections.TryGetValue(vehicleName.ToLower(), out List<WebSocket> wsList);
             wsList.Remove(ws);
             _logger.Log(LogLevel.Error, "Websocket connection closed for " + vehicleName.ToUpper() + connKey + "!\n");
 
             // Close the WebSocket connection
             ws.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection closed", CancellationToken.None);
-            // }
-            // finally
-            // {
-            // _lock.Release();
-            // }
         }
     }
 }
