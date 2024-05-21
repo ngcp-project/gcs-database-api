@@ -5,6 +5,6 @@ namespace Database.Models
     {
 
         public string missionName { get; set; }
-        public string currentStage { get; set; }
+        // public string currentStage { get; set; }
     }
 }

@@ -148,17 +148,27 @@ public class MissionInfoController : ControllerBase
         try
         {
             MissionInfo missionInfo = JsonSerializer.Deserialize<MissionInfo>(gcs.StringGet(requestBody.missionName));
-            foreach (MissionStage stage in missionInfo.stages)
-            {
-                if (stage.stageName == requestBody.currentStage)
-                {
-                    missionInfo.currentStageId = requestBody.currentStage;
-                    await gcs.StringSetAsync(requestBody.missionName, missionInfo.ToString());
 
-                    endpointReturn.message = "Posted CurrentStage";
-                    return Ok(endpointReturn.ToString());
-                }
+            if (missionInfo.currentStageId == missionInfo.stages.Length - 1)
+            {
+                endpointReturn.error = "Mission is already at the last stage";
+                return BadRequest(endpointReturn.ToString());
             }
+            missionInfo.currentStageId++;
+            // foreach (MissionStage stage in missionInfo.stages)
+            // {
+            //     if (stage.stageName == requestBody.currentStage)
+            //     {
+            //         missionInfo.currentStageId = requestBody.currentStage;
+            //         await gcs.StringSetAsync(requestBody.missionName, missionInfo.ToString());
+
+            //         endpointReturn.message = "Posted CurrentStage";
+            //         return Ok(endpointReturn.ToString());
+            //     }
+            // }
+            await gcs.StringSetAsync(requestBody.missionName, missionInfo.ToString());
+            endpointReturn.message = "Updated CurrentStage to " + missionInfo.stages[missionInfo.currentStageId].stageName;
+            return Ok(endpointReturn.ToString());
         }
         catch (Exception e)
         {
@@ -166,7 +176,6 @@ public class MissionInfoController : ControllerBase
             return BadRequest(endpointReturn.ToString());
         }
 
-        endpointReturn.error = "MissionStage does not exist";
-        return BadRequest(endpointReturn.ToString());
+
     }
 }
