@@ -3,7 +3,6 @@ using StackExchange.Redis;
 using Database.Models;
 using System.Reflection;
 using System.Text.Json;
-using System.Linq;
 
 
 namespace Database.Controllers;
