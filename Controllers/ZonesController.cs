@@ -28,7 +28,8 @@ public class ZonesController : ControllerBase
             return BadRequest(endpointReturn.ToString());
         }
 
-        return Ok(_redis.StringGet("keepIn").ToString().Split("|"));
+        endpointReturn.data = _redis.StringGet("keepIn").ToString();
+        return Ok(endpointReturn.ToString());
     }
 
     [HttpGet("zones/out")]
@@ -68,7 +69,7 @@ public class ZonesController : ControllerBase
                 defaultValue = Activator.CreateInstance(property.PropertyType);
             }
 
-            if (value?.Equals(defaultValue) == true || value == null)
+            if (value == null)
             {
                 missingFields.Add(property.Name);
             }
@@ -81,11 +82,6 @@ public class ZonesController : ControllerBase
             // If any field is missing, return a bad request
         }
         requestBody.keepIn = true;
-        if (requestBody.zoneShapeType == ShapeType.Unknown)
-        {
-            endpointReturn.error = "Invalid shape type";
-            return BadRequest(endpointReturn.ToString());
-        }
 
         Console.WriteLine(requestBody.ToString());
         if (_redis.StringGet("keepIn").IsNullOrEmpty)
@@ -123,7 +119,7 @@ public class ZonesController : ControllerBase
                 defaultValue = Activator.CreateInstance(property.PropertyType);
             }
 
-            if (value?.Equals(defaultValue) == true || value == null)
+            if (value == null)
             {
                 missingFields.Add(property.Name);
             }
@@ -135,14 +131,6 @@ public class ZonesController : ControllerBase
                 return BadRequest(endpointReturn.ToString());
             }
 
-        }
-
-        // validate shape type
-        requestBody.keepIn = false;
-        if (requestBody.zoneShapeType == ShapeType.Unknown)
-        {
-            endpointReturn.error = "Invalid shape type";
-            return BadRequest(endpointReturn.ToString());
         }
 
 
@@ -170,8 +158,8 @@ public class ZonesController : ControllerBase
             return BadRequest(endpointReturn.ToString());
         }
 
+        _redis.KeyDelete("keepIn");
         endpointReturn.message = "Cleared keep-in zones successfully.";
-        endpointReturn.data = _redis.KeyDeleteAsync("keepIn").ToString();
         return Ok(endpointReturn.ToString());
     }
 
@@ -182,12 +170,12 @@ public class ZonesController : ControllerBase
         // check keep-in zones exist
         if (_redis.StringGet("keepOut").IsNullOrEmpty)
         {
-            endpointReturn.error = "No keep-in zones found.";
+            endpointReturn.error = "No keep-out zones found.";
             return BadRequest(endpointReturn.ToString());
         }
 
+        _redis.KeyDelete("keepOut");
         endpointReturn.message = "Cleared keep-out zones successfully.";
-        endpointReturn.data = _redis.KeyDeleteAsync("keepOut").ToString();
         return Ok(endpointReturn.ToString());
     }
 
