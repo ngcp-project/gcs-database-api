@@ -21,10 +21,8 @@ public class MissionStageTest{
         string coor2 = coord2.ToString();                //wrong
         var twoDimensionalArray = new Coordinate[] {coord1, coord2};    //wrong
         restRequest.AddJsonBody(new {
-            key = "Mexico",
-            stageID = "Polygon",
+            missionName = "Polygon",
             stageName = "Moonwalk",
-            stageStatus = "NOT_STARTED",
             vehicleKeys = twoDimensionalArray,
         });
         //Act

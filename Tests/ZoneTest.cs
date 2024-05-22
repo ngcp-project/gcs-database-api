@@ -64,8 +64,8 @@ public class ZoneTest {
         RestRequest restRequest = new RestRequest(baseUrl, Method.Post);
         Coordinate coord1 = new Coordinate(5.0, 7.0);
         Coordinate coord2 = new Coordinate(6.7, 12.45);
-        string coor1 = JsonSerializer.Serialize(coord1);
-        string coor2 = JsonSerializer.Serialize(coord2);
+        string coor1 = coord1.ToString();
+        string coor2 = coord2.ToString();
         var coordArray = new Coordinate[] {coord1, coord2};
         restRequest.AddJsonBody(new {
             name = "Tijuana",
