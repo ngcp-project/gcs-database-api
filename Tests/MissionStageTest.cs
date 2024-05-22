@@ -7,7 +7,6 @@ using NUnit.Framework;
 using NUnit.Framework.Constraints;
 using System.Diagnostics;
 using Database.Models;
-using System.Text.Json;
 public class MissionStageTest{
     [Test]
     public void PostMissionStage(){
@@ -18,8 +17,8 @@ public class MissionStageTest{
         //Arrange Post Body
         Coordinate coord1 = new Coordinate(1.0, 2.0);                   //wrong
         Coordinate coord2 = new Coordinate(1.5, 2.69);                  //wrong
-        string coor1 = JsonSerializer.Serialize(coord1);                //wrong
-        string coor2 = JsonSerializer.Serialize(coord2);                //wrong
+        string coor1 = coord1.ToString();                //wrong
+        string coor2 = coord2.ToString();                //wrong
         var twoDimensionalArray = new Coordinate[] {coord1, coord2};    //wrong
         restRequest.AddJsonBody(new {
             key = "Mexico",
