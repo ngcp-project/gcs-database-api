@@ -24,8 +24,8 @@ public class MissionStageTest{
         restRequest.AddJsonBody(new {
             key = "Mexico",
             stageID = "Polygon",
-            stageName = "Moonwalk"
-            stageStatus = "NOT_STARTED"
+            stageName = "Moonwalk",
+            stageStatus = "NOT_STARTED",
             vehicleKeys = twoDimensionalArray,
         });
         //Act
