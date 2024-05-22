@@ -76,7 +76,7 @@ public class MissionStageController : ControllerBase
             endpointReturn.error = "Inputted MissionStage does not exist";
             return BadRequest(endpointReturn.ToString());
         }
-        
+
         return Ok(endpointReturn.ToString());
     }
 
@@ -179,9 +179,10 @@ public class MissionStageController : ControllerBase
         bool foundMissionStage = false;
         foreach (MissionStage stage in stages)
         {
-            if (missionInfo.currentStageId == requestBody.stageName)
+            // Handle deletion of current stage
+            if (missionInfo.stages[missionInfo.currentStageId].stageName == requestBody.stageName)
             {
-                missionInfo.currentStageId = "";
+                missionInfo.currentStageId = 0;
             }
             if (stage.stageName == requestBody.stageName)
             {

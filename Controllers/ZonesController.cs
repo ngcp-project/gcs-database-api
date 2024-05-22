@@ -69,7 +69,7 @@ public class ZonesController : ControllerBase
                 defaultValue = Activator.CreateInstance(property.PropertyType);
             }
 
-            if (value?.Equals(defaultValue) == true || value == null)
+            if (value == null)
             {
                 missingFields.Add(property.Name);
             }
@@ -119,7 +119,7 @@ public class ZonesController : ControllerBase
                 defaultValue = Activator.CreateInstance(property.PropertyType);
             }
 
-            if (value?.Equals(defaultValue) == true || value == null)
+            if (value == null)
             {
                 missingFields.Add(property.Name);
             }
@@ -170,7 +170,7 @@ public class ZonesController : ControllerBase
         // check keep-in zones exist
         if (_redis.StringGet("keepOut").IsNullOrEmpty)
         {
-            endpointReturn.error = "No keep-in zones found.";
+            endpointReturn.error = "No keep-out zones found.";
             return BadRequest(endpointReturn.ToString());
         }
 
