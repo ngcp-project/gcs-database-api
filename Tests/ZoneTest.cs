@@ -7,7 +7,7 @@ using NUnit.Framework.Constraints;
 using System.Diagnostics;
 using Database.Models;
 using System.Text.Json;
-
+namespace DatabaseAPI.Tests;
 public class ZoneTest {
     [Test]
     public void getInZones() {

@@ -1,8 +1,7 @@
 using System.Net;
 using FluentAssertions;
 using RestSharp;
-
-// namespace DatabaseAPI.Tests;
+namespace DatabaseAPI.Tests;
 public class Tests
 {
     [SetUp]
