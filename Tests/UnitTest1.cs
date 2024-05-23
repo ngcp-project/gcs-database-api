@@ -1,7 +1,7 @@
 using System.Net;
 using FluentAssertions;
 using RestSharp;
-
+namespace DatabaseAPI.Tests;
 public class Tests
 {
     [SetUp]
@@ -10,14 +10,14 @@ public class Tests
     }
 
     [Test]
-    public void Test1()
+    public void TestingInitalization()
     {
 
         Assert.Pass();
     }
 
     [Test]
-    public void SearchBooks()
+    public void TestRESTEndpointCall()
     {
         var baseUrl = "https://fakerestapi.azurewebsites.net/api/v1/Books";
         RestClient client = new RestClient(baseUrl);
@@ -26,4 +26,5 @@ public class Tests
         restResponse.Should().NotBeNull();
         restResponse.StatusCode.Should().Be(HttpStatusCode.OK);
     }
+
 }

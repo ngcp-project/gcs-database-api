@@ -28,7 +28,7 @@
         {
             "label": "Run tests",
             "type": "shell",
-            "command": "cd Tests | dotnet test",
+            "command": "cd Tests | dotnet test -v n",
             "group": {
                 "kind": "test",
                 "isDefault": true
