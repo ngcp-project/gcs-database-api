@@ -104,6 +104,7 @@ public class MissionInfoController : ControllerBase
         {
             missionName = requestBody.missionName,
             // currentStageId = requestBody.stageName,
+            // currentStageId = requestBody.stageName,
             stages = stages.ToArray()
         };
         // Initializes new MissionInfo object with a MissionStage attached to it
