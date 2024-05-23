@@ -15,11 +15,11 @@ public class MissionStageTest{
         RestClient client = new RestClient(baseUrl);
         RestRequest restRequest = new RestRequest(baseUrl, Method.Post);
         //Arrange Post Body
-        Coordinate coord1 = new Coordinate(1.0, 2.0);                   //wrong
-        Coordinate coord2 = new Coordinate(1.5, 2.69);                  //wrong
-        string coor1 = coord1.ToString();                //wrong
-        string coor2 = coord2.ToString();                //wrong
-        var twoDimensionalArray = new Coordinate[] {coord1, coord2};    //wrong
+        VehicleData coord1 = new VehicleData();          
+        VehicleData coord2 = new VehicleData();          
+        string coor1 = coord1.ToString();                
+        string coor2 = coord2.ToString();                
+        var twoDimensionalArray = new string[] {coord1, coord2};
         restRequest.AddJsonBody(new {
             missionName = "Polygon",
             stageName = "Moonwalk",
@@ -34,11 +34,27 @@ public class MissionStageTest{
 
     [Test]
     public void GetMissionStage(){
-
+        //Arrange
+        var baseUrl = "http://localhost:5135/MissionStage";
+        RestClient client = new RestClient(baseUrl);
+        RestRequest restRequest = new RestRequest(baseUrl, Method.Get);
+        //Act
+        var queryResult = client.Execute(restRequest);
+        //Assert
+        Assert.That(queryResult.StatusCode, Is.EqualTo(HttpStatusCode.OK), "Status code is not OK");
+        Assert.That(queryResult.Content, Is.Not.Null, "Response content is null");
     }
 
     [Test]
     public void DeleteMissionStage(){
-
+        //Arrange
+        var baseUrl = "http://localhost:5135/MissionStage";
+        RestClient client = new RestClient(baseUrl);
+        RestRequest restRequest = new RestRequest(baseUrl, Method.Delete);
+        //Act
+        var queryResult = client.Execute(restRequest);
+        //Assert
+        Assert.That(queryResult.StatusCode, Is.EqualTo(HttpStatusCode.OK), "Status code is not OK");
+        Assert.That(queryResult.Content, Is.Not.Null, "Response content is null");
     }
 }
