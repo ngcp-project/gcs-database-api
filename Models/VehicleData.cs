@@ -6,7 +6,7 @@ namespace Database.Models
     public class VehicleData
     {
         public String vehicleName { get; set; }
-        private bool IsManual { get; set; } = true;
+        public bool IsManual { get; set; } = true;
         public Coordinate target { get; set; }
         public Coordinate[] searchArea { get; set; }
 
