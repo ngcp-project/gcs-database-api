@@ -16,16 +16,16 @@ public class MissionStageTest{
         RestClient client = new RestClient(baseUrl);
         RestRequest restRequest = new RestRequest(baseUrl, Method.Post);
         //Arrange Post Body
-        VehicleData coord1 = new VehicleData();          
-        VehicleData coord2 = new VehicleData();          
-        string coor1 = coord1.ToString();                
-        string coor2 = coord2.ToString();                
-        var twoDimensionalArray = new string[] {coord1, coord2};
-        restRequest.AddJsonBody(new {
-            missionName = "Polygon",
-            stageName = "Moonwalk",
-            vehicleKeys = twoDimensionalArray,
-        });
+        // VehicleData coord1 = new VehicleData();          
+        // VehicleData coord2 = new VehicleData();          
+        // string coor1 = coord1.ToString();                
+        // string coor2 = coord2.ToString();                
+        // var twoDimensionalArray = new string[] {coord1, coord2};
+        // restRequest.AddJsonBody(new {
+        //     missionName = "Polygon",
+        //     stageName = "Moonwalk",
+        //     vehicleKeys = twoDimensionalArray,
+        // });
         //Act
         var queryResult = client.Execute(restRequest);
         //Assert
