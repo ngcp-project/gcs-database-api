@@ -1,8 +1,10 @@
 using System.Net;
 using FluentAssertions;
 using RestSharp;
+using NUnit.Framework;
+
 namespace DatabaseAPI.Tests;
-public class Tests
+public class UnitTests
 {
     [SetUp]
     public void Setup()
