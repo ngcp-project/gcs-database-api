@@ -2,13 +2,15 @@ using System.Text.Json;
 
 namespace Database.Models
 {
-    public class EndpointReturn
-    {
+    public class EndpointReturn<T>
+        {
         public string message { get; set; }
         public string error { get; set; }
-        public string data { get; set; }
 
-        public EndpointReturn(string message, string error, string data)
+        //String -> Generic
+        public T data { get; set; } 
+
+        public EndpointReturn(string message, string error, T data)
         {
             this.message = message;
             this.error = error;

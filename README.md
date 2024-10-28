@@ -24,7 +24,7 @@ This is the primary codebase for the GCS database and its API.
 11. You should now see the string with the last number sent using the js script
 
 For Docker Setup:
-1. Create .env file if it doesn't alrady exist using format provided in  .env.sample
+1. Create .env file if it doesn't already exist using format provided in  .env.sample
 2. Enter the following line into the CLI: docker-compose up --detach
 3. `dotnet run` in console
 4. Open Redis Commander and log in
