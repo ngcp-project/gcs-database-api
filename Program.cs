@@ -1,17 +1,15 @@
-// using Database.Handlers;
+using Database.Handlers;
 using Microsoft.EntityFrameworkCore;
-using Database.Context;
-// using Microsoft.Extensions.Options;
+using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// builder.Services.AddSingleton<IConnectionMultiplexer>(c => {return ConnectionMultiplexer.Connect("localhost");});
-// builder.Services.AddScoped<RabbitMqConsumer>();
+builder.Services.AddScoped<RabbitMqConsumer>();
 builder.Services.AddControllers();
-// builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddDbContext </*[INSERT CONTEXT NAME]*/>(Options =>
-    options.UseNpgsql(Configuration.GetConnectionString("DefaultConnecton")));
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddDbContext<AppDbContext>(Options =>
+    Options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 

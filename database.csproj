@@ -16,7 +16,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
     <PackageReference Include="RestSharp" Version="111.4.1" />
     <PackageReference Include="RabbitMQ.Client" Version="6.8.1" />
-    <PackageReference Include="StackExchange.Redis" Version="2.8.0" />
+    <!-- <PackageReference Include="StackExchange.Redis" Version="2.8.0" /> -->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.0" />
   </ItemGroup>
 
