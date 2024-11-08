@@ -103,7 +103,7 @@ public class ZonesController : ControllerBase
         // // Initializes the array to have the first element as the first zone
         // //Could be 1 error
         // await _redis.StringAppendAsync("keepIn", "|" + requestBody.ToString());
-        // endpointReturn.message = "Posted keepIn zone successfully.";
+        endpointReturn.message = "Posted keepIn zone successfully.";
         return Ok(endpointReturn.ToString());
     } // end postKeepIn
 
