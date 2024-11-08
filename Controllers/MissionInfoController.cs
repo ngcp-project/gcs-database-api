@@ -27,7 +27,7 @@ public class MissionInfoController : ControllerBase
 
         List<string> missingFields = new List<string>();
 
-        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
+        EndpointReturn<object> endpointReturn = new EndpointReturn<object>("", "", null);
         Type type = typeof(MissionInfoGET);
         PropertyInfo[] properties = type.GetProperties();
 
@@ -56,9 +56,11 @@ public class MissionInfoController : ControllerBase
             }
 
         }
-        string result = gcs.StringGet(requestBody.missionName).ToString();
+        
+        var data = gcs.StringGet(requestBody.missionName).ToString();
+        var result= JsonSerializer.Deserialize<MissionInfo>(data);                                                              
         endpointReturn.data = result;
-        return Ok(endpointReturn.ToString());
+        return Ok(endpointReturn);
     }
 
 
@@ -67,7 +69,7 @@ public class MissionInfoController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
-        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
+        EndpointReturn<Object> endpointReturn = new EndpointReturn<Object>("", "", null);
         Type type = typeof(MissionInfoPOST);
         PropertyInfo[] properties = type.GetProperties();
 
@@ -112,7 +114,7 @@ public class MissionInfoController : ControllerBase
 
         await gcs.StringSetAsync(requestBody.missionName, missionInfo.ToString());
         endpointReturn.message = "Posted MissionInfo";
-        return Ok(endpointReturn.ToString());
+        return Ok(endpointReturn);
     }
 
     [HttpPost("CurrentStage")]
@@ -120,7 +122,7 @@ public class MissionInfoController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
-        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
+        EndpointReturn<Object> endpointReturn = new EndpointReturn<Object>("", "",null);
         Type type = typeof(CurrentStagePOST);
         PropertyInfo[] properties = type.GetProperties();
 

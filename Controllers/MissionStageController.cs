@@ -24,7 +24,7 @@ public class MissionStageController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
-        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
+        EndpointReturn<Object> endpointReturn = new EndpointReturn<Object>("", "", null);
         Type type = typeof(MissionStageQuery);
         PropertyInfo[] properties = type.GetProperties();
 
@@ -67,7 +67,7 @@ public class MissionStageController : ControllerBase
         {
             if (stage.stageName == requestBody.stageName)
             {
-                endpointReturn.data = JsonSerializer.Serialize(stage);
+                endpointReturn.data = stage;
                 endpointReturn.message = "Found MissionStage";
                 foundMissionStage = true;
                 break;
@@ -89,7 +89,7 @@ public class MissionStageController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
-        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
+        EndpointReturn<Object> endpointReturn = new EndpointReturn<Object>("", "", null);
         Type type = typeof(MissionStagePOST);
         PropertyInfo[] properties = type.GetProperties();
 
@@ -228,7 +228,7 @@ public class MissionStageController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
-        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
+        EndpointReturn<Object> endpointReturn = new EndpointReturn<Object>("", "", null);
         Type type = typeof(MissionStageQuery);
         PropertyInfo[] properties = type.GetProperties();
 

@@ -34,7 +34,7 @@ public class VehicleStatusController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
-        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
+        EndpointReturn<Object> endpointReturn = new EndpointReturn<Object>("", "", null);
         Type type = typeof(VehicleKey); // Replace ExampleModel with the respective model
         PropertyInfo[] properties = type.GetProperties();
         foreach (System.Reflection.PropertyInfo property in requestBody.GetType().GetProperties())
@@ -75,7 +75,7 @@ public class VehicleStatusController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
-        EndpointReturn endpointReturn = new EndpointReturn("", "", "");
+        EndpointReturn<Object> endpointReturn = new EndpointReturn<Object>("", "", null);
         Type type = typeof(VehicleKey); // Replace ExampleModel with the respective model
         PropertyInfo[] properties = type.GetProperties();
         foreach (System.Reflection.PropertyInfo property in requestBody.GetType().GetProperties())
@@ -177,7 +177,7 @@ public class VehicleStatusController : ControllerBase
     [HttpGet("GetVehicleStatus")]
     public IActionResult GetVehicleStatus([FromQuery]string name)
     {
-        EndpointReturn endpointReturn = new EndpointReturn("","","");
+        EndpointReturn<Object> endpointReturn = new EndpointReturn<Object>("","","");
 
         if (gcs.StringGet($"{name}-status").IsNullOrEmpty)
         {
