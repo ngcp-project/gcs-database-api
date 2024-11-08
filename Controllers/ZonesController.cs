@@ -159,7 +159,7 @@ public class ZonesController : ControllerBase
         // // Initializes the array to have the first element as the first zone
 
         // await _redis.StringAppendAsync("keepOut", "|" + requestBody.ToString());
-        // endpointReturn.message = "Posted keepOut zone successfully.";
+        endpointReturn.message = "Posted keepOut zone successfully.";
         return Ok(endpointReturn.ToString());
     } // end postKeepOut
 
