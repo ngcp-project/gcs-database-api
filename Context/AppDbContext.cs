@@ -8,4 +8,8 @@ public class AppDbContext : DbContext
     }
 
     // Add DbSet<T> properties here once know table structures
+    public DbSet<MissionInfo> MissionInfos { get; set; }
+    public DbSet<MissionStage> MissionStages { get; set; }
+    public DbSet<Geofence> Geofences { get; set; }
+
 }
