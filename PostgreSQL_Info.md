@@ -61,6 +61,5 @@ using var context = _context.CreateDbContext();
 <br/><br/>
 
 - to add tables to the database, i ran these commands that setup the tables according to your context i believe. This is also ran when the schema updates. 
-``dotnet ef migrations add InitialCreate``
-<br/>
-``dotnet ef database update``
+    - ``dotnet ef migrations add InitialCreate``
+    - ``dotnet ef database update``
