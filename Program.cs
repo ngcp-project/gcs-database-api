@@ -1,22 +1,14 @@
 using Database.Handlers;
-using StackExchange.Redis;
-
-
-//json.Set("UGV_[timestamp]", "$", UGV_tel);
-//Console.WriteLine(json.Get("UGV_[timestamp]")); // prints json
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddSingleton<IConnectionMultiplexer>(c =>
-{
-    return ConnectionMultiplexer.Connect("localhost");
-});
+builder.Services.AddDbContextPool<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<RabbitMqConsumer>();
-
 builder.Services.AddControllers();
-
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
@@ -27,16 +19,15 @@ var app = builder.Build();
 //     app.UseSwagger();
 //     app.UseSwaggerUI();
 // }
+
 app.UseCors(builder =>
 {
     builder.WithOrigins("http://localhost:4000") // Allow requests from your Vue.js frontend
            .AllowAnyHeader()
            .AllowAnyMethod();
 });
+
 app.UseWebSockets();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
