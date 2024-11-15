@@ -9,8 +9,9 @@ public class AppDbContext : DbContext
     
     // These are the tables that are being created (idk how the table structure is)
     public DbSet<MissionInfo> MissionInfos { get; set; }
-    // public DbSet<MissionStage> MissionStages { get; set; }
-    // public DbSet<Geofence> Geofences { get; set; }
+    public DbSet<Vehicle> Vehicles { get; set; }
+    public DbSet<MissionStage> MissionStages { get; set; }
+    public DbSet<Zone> Zones { get; set; }
 
     // might need OnModelCreating or something to define relationships between tables
 }

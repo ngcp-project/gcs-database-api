@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using StackExchange.Redis;
+// using StackExchange.Redis;
 using Database.Models;
 using System.Reflection;
 using System.Text.Json;
@@ -12,13 +12,18 @@ using System.Threading.Channels;
 namespace Database.Controllers;
 public class MissionInfoController : ControllerBase
 {
-    private ConnectionMultiplexer conn;
-    private readonly IDatabase gcs;
-
-    public MissionInfoController()
+    // private ConnectionMultiplexer conn;
+    // private readonly IDatabase gcs;
+    
+    // public MissionInfoController()
+    // {
+    //     conn = DBConn.Instance().getConn();
+    //     gcs = conn.GetDatabase();
+    // }
+    private readonly AppDbContext _context;
+    public MissionInfoController(AppDbContext context)
     {
-        conn = DBConn.Instance().getConn();
-        gcs = conn.GetDatabase();
+        _context = context;
     }
 
     [HttpGet("MissionInfo")]
@@ -26,6 +31,7 @@ public class MissionInfoController : ControllerBase
     {
 
         List<string> missingFields = new List<string>();
+        var data = _context.MissionInfos.ToList();
 
         EndpointReturn<object> endpointReturn = new EndpointReturn<object>("", "", null);
         Type type = typeof(MissionInfoGET);
@@ -56,10 +62,11 @@ public class MissionInfoController : ControllerBase
             }
 
         }
-        
-        var data = gcs.StringGet(requestBody.missionName).ToString();
-        var result= JsonSerializer.Deserialize<MissionInfo>(data);                                                              
-        endpointReturn.data = result;
+
+        // var data = gcs.StringGet(requestBody.missionName).ToString();
+        // var result = JsonSerializer.Deserialize<MissionInfo>(data);
+        // endpointReturn.data = result;
+        endpointReturn.data = data;
         return Ok(endpointReturn);
     }
 
@@ -112,7 +119,9 @@ public class MissionInfoController : ControllerBase
         // Initializes new MissionInfo object with a MissionStage attached to it
 
 
-        await gcs.StringSetAsync(requestBody.missionName, missionInfo.ToString());
+        // await gcs.StringSetAsync(requestBody.missionName, missionInfo.ToString());
+        _context.MissionInfos.Add(missionInfo);
+        _context.SaveChanges();
         endpointReturn.message = "Posted MissionInfo";
         return Ok(endpointReturn);
     }
@@ -122,7 +131,7 @@ public class MissionInfoController : ControllerBase
     {
         List<string> missingFields = new List<string>();
 
-        EndpointReturn<Object> endpointReturn = new EndpointReturn<Object>("", "",null);
+        EndpointReturn<Object> endpointReturn = new EndpointReturn<Object>("", "", null);
         Type type = typeof(CurrentStagePOST);
         PropertyInfo[] properties = type.GetProperties();
 
@@ -154,7 +163,8 @@ public class MissionInfoController : ControllerBase
         // Pull MissionInfo from database and update currentStageId
         try
         {
-            MissionInfo missionInfo = JsonSerializer.Deserialize<MissionInfo>(gcs.StringGet(requestBody.missionName));
+            // MissionInfo missionInfo = JsonSerializer.Deserialize<MissionInfo>(gcs.StringGet(requestBody.missionName));
+            MissionInfo missionInfo = _context.MissionInfos.Where(m => m.missionName == requestBody.missionName).FirstOrDefault();
 
             if (missionInfo.currentStageId == missionInfo.stages.Length - 1)
             {
@@ -164,7 +174,7 @@ public class MissionInfoController : ControllerBase
 
             // RabbitMQ sender
             int nextStage = missionInfo.currentStageId + 1;
-            ConnectionFactory factory = new ConnectionFactory(){HostName = "localhost"};
+            ConnectionFactory factory = new ConnectionFactory() { HostName = "localhost" };
             var cts = new CancellationTokenSource();
             MissionStage nextStageInfo = missionInfo.stages[nextStage];
             bool doesVehiclesReply = false;
@@ -256,7 +266,7 @@ public class MissionInfoController : ControllerBase
             //         return Ok(endpointReturn.ToString());
             //     }
             // }
-            
+
             if (!doesVehiclesReply)
             {
                 endpointReturn.error = "No replies received from the vehicles";
@@ -264,9 +274,10 @@ public class MissionInfoController : ControllerBase
             }
 
             missionInfo.currentStageId = nextStage;
-            
-            await gcs.StringSetAsync(requestBody.missionName, missionInfo.ToString());
-            
+
+            // await gcs.StringSetAsync(requestBody.missionName, missionInfo.ToString());
+            await _context.SaveChangesAsync();
+
             endpointReturn.message = "Updated CurrentStage to " + missionInfo.stages[missionInfo.currentStageId].stageName;
             return Ok(endpointReturn.ToString());
         }
@@ -304,11 +315,13 @@ public class MissionInfoController : ControllerBase
         // });
 
 
-        try {
+        try
+        {
             await Task.Delay(3000, token);
         }
-        catch (TaskCanceledException) {
-            
+        catch (TaskCanceledException)
+        {
+
             return true;
         }
 

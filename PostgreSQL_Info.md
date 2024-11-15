@@ -48,18 +48,21 @@
 
 - at the top of the controller definition i had to have something like 
 ```C#
-private readonly IDbContextFactory<AppDbContext> _context;
-public NameController(IDbContextFactory<AppDbContext> context){
+private readonly AppDbContext _context;
+public MissionInfoController(AppDbContext context)
+{
     _context = context;
 }
 ```
-then at the top of each route, I needed to have
-```C#
-using var context = _context.CreateDbContext();
-```
-*NOTE: I'm not too sure if this was done correctly or if there is another way I was supposed to use the context. I think for this I had to use something called AddContextFactory() or something in Program.cs which manually creates DbContext instances where dependency injection isn't available (idk what that means)
 <br/><br/>
 
 - to add tables to the database, i ran these commands that setup the tables according to your context i believe. This is also ran when the schema updates. 
     - ``dotnet ef migrations add InitialCreate``
     - ``dotnet ef database update``
+
+
+## Where I left off:
+**Testing MissionInfos**:
+
+    - need to figure out the foreign key stuff happens
+    - everything else is commented out
